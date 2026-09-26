@@ -5,6 +5,9 @@
  *   t = anchorTime + (now - anchorWallClock) * speed
  * and the anchor is reset on every play / pause / seek / speed change. Poses therefore depend only
  * on t, and frame rate, dropped frames or long playback cannot make playback drift.
+ *
+ * Speed is signed: a negative speed plays the clip in reverse with the same formula (t is computed,
+ * never accumulated, so a pose at a given t is identical whichever direction reached it).
  */
 export interface PhaseSpan {
   id: string;
@@ -14,16 +17,22 @@ export interface PhaseSpan {
 }
 
 export type PlaybackSpeed = number;
+/** Speed magnitudes offered by the UI; the direction (sign) is chosen separately. */
 export const SPEEDS: readonly PlaybackSpeed[] = [0.25, 0.5, 1, 2];
 export const DEFAULT_INSPECTION_RATE = 30;
+
+export type PlaybackDirection = 1 | -1;
 
 export interface PlayerSnapshot {
   t: number;
   duration: number;
   playing: boolean;
+  /** Signed playback rate: negative = reverse. Never 0. */
   speed: number;
+  /** Sign of `speed` (1 forward, -1 reverse). */
+  direction: PlaybackDirection;
   loop: boolean;
-  /** Set once when a non-looping playback reaches the end. */
+  /** Set once when a non-looping playback reaches the end it is heading for (t = duration forward, t = 0 in reverse). */
   ended: boolean;
 }
 
@@ -39,14 +48,25 @@ export interface PlayerOptions {
 export type PlayerListener = (s: PlayerSnapshot) => void;
 
 export interface Player {
-  /** Current time. At the end of a non-looping clip this transitions to paused (deterministically). */
+  /**
+   * Current time. When a non-looping playback reaches the end it is heading for (t = duration
+   * forward, t = 0 in reverse) this transitions to paused, deterministically.
+   */
   time(): number;
   snapshot(): PlayerSnapshot;
+  /**
+   * Starts playback in the current direction. A non-looping clip parked at the end it would run
+   * into restarts from the other end (forward at t = duration restarts at 0; reverse at t = 0
+   * starts from the end).
+   */
   play(): void;
   pause(): void;
   toggle(): void;
   seek(t: number): void;
+  /** Any finite, non-zero speed; negative plays in reverse. Invalid values are ignored. */
   setSpeed(speed: number): void;
+  /** Keeps |speed| and sets its sign. */
+  setDirection(direction: PlaybackDirection): void;
   setLoop(loop: boolean): void;
   setDuration(duration: number): void;
   setInspectionRate(rate: number): void;
@@ -71,7 +91,7 @@ export function phaseIndexAt(phases: readonly PhaseSpan[], t: number): number {
 export function createPlayer(opts: PlayerOptions): Player {
   const now = opts.now;
   let duration = Math.max(opts.duration, 1e-6);
-  let speed = opts.speed ?? 1;
+  let speed = opts.speed !== undefined && Number.isFinite(opts.speed) && opts.speed !== 0 ? opts.speed : 1;
   let loop = opts.loop ?? true;
   let playing = false;
   let ended = false;
@@ -98,26 +118,36 @@ export function createPlayer(opts: PlayerOptions): Player {
     for (const l of listeners) l(s);
   };
 
+  /** The end a non-looping playback in the current direction runs into. */
+  const terminal = (): number => (speed > 0 ? duration : 0);
+  const reachedTerminal = (r: number): boolean => (speed > 0 ? r >= duration : r <= 0);
+
   const api: Player = {
     time() {
       const r = raw();
-      if (playing && !loop && r >= duration) {
+      if (playing && !loop && reachedTerminal(r)) {
+        const end = terminal();
         playing = false;
         ended = true;
-        reanchor(duration);
+        reanchor(end);
         emit();
-        return duration;
+        return end;
       }
       return wrap(r);
     },
     snapshot() {
-      const t = playing && !loop && raw() >= duration ? duration : wrap(raw());
-      return { t, duration, playing, speed, loop, ended };
+      // Non-looping times are clamped by wrap(), so a playback that has just run past its end reads
+      // as that end even before time() records the transition to paused.
+      return { t: wrap(raw()), duration, playing, speed, direction: speed < 0 ? -1 : 1, loop, ended };
     },
     play() {
       if (playing) return;
       let t = wrap(raw());
-      if (!loop && t >= duration - EPS) t = 0;
+      if (!loop) {
+        // Parked at the end this direction runs into: start again from the other end.
+        if (speed > 0 && t >= duration - EPS) t = 0;
+        else if (speed < 0 && t <= EPS) t = duration;
+      }
       ended = false;
       playing = true;
       reanchor(t);
@@ -141,11 +171,16 @@ export function createPlayer(opts: PlayerOptions): Player {
       emit();
     },
     setSpeed(s) {
-      if (!(s > 0) || !Number.isFinite(s)) return;
+      if (!Number.isFinite(s) || s === 0) return;
       const t = api.time();
       speed = s;
       reanchor(t);
       emit();
+    },
+    setDirection(direction) {
+      if (direction !== 1 && direction !== -1) return;
+      if ((speed < 0 ? -1 : 1) === direction) return;
+      api.setSpeed(-speed);
     },
     setLoop(l) {
       const t = api.time();

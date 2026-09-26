@@ -35,6 +35,19 @@ export const PALETTE = {
   trajectoryComparison: 0xa0a9b8,
   stabilization: 0xe8590c,
   hostBone: 0x0b7285,
+
+  /** Contact shadows: colour and peak opacity (at 0 mm) per theme. */
+  shadow: 0x1a2430,
+  shadowDark: 0x000000,
+  shadowOpacity: 0.46,
+  shadowOpacityDark: 0.62,
+  /** Thin "planted" ring at fully active contact sites: side colours (UI --left / --right), seat neutral. */
+  plantedLeft: 0x1c847d,
+  plantedRight: 0xa8680e,
+  plantedCenter: 0x6f604c,
+  plantedLeftDark: 0x4cc3b9,
+  plantedRightDark: 0xf0b454,
+  plantedCenterDark: 0xc9b89e,
 } as const;
 
 export type ContactStateColor = 'active' | 'engaging' | 'releasing' | 'fail';

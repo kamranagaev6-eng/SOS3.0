@@ -2,7 +2,7 @@
 
 > Geometric/kinematic checks of synthetic, unreviewed fixtures. Passing them is **not** clinical validation and says nothing about balance, loading, muscle activity or safety.
 
-Generated 2026-09-26T03:34:17.545Z by `node scripts/metrics-report.ts` in 240.5 s.
+Generated 2026-09-26T05:53:02.985Z by `node scripts/metrics-report.ts` in 234.3 s.
 Environment: Node v24.21.0, linux 6.18.44-fc-v37, Intel(R) Xeon(R) Processor @ 2.10GHz × 4.
 Sampling: tiers 1 and 2 at 240 Hz (streamed), baseline at 60 Hz (defaults only).
 
@@ -16,18 +16,18 @@ Sampling: tiers 1 and 2 at 240 Hz (streamed), baseline at 60 Hz (defaults only).
 
 | Recipe | Tier | Planted disp. (mm) | Contact err (mm) | Orientation (°) | Penetration (mm) | Bone rel. err | Joint vel. jump (rad/s) | Linear vel. jump (m/s) | Max stabilisation (mm) | Limit violations | Unreachable samples |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| sit-to-stand.v1 | baseline (defaults) | 646.065 | 646.065 | 22.000 | 477.701 | 1.4e-15 | 0.254 | 0.098 | 0.000 | 0 | 0 |
-| sit-to-stand.v1 | analytic | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.155 | 0.060 | 0.000 | 0 | 0 |
-| sit-to-stand.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.155 | 0.060 | 0.000 | 0 | 0 |
-| bilateral-squat.v1 | baseline (defaults) | 507.463 | 507.463 | 16.500 | 0.000 | 1.9e-15 | 0.189 | 0.022 | 0.000 | 0 | 0 |
-| bilateral-squat.v1 | analytic | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.057 | 0.006 | 0.000 | 0 | 0 |
-| bilateral-squat.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.057 | 0.006 | 0.000 | 0 | 0 |
-| step-up-down.v1 | baseline (defaults) | 443.632 | 470.213 | 5.500 | 34.351 | 9.3e-16 | 0.688 | 0.100 | 0.000 | 0 | 0 |
-| step-up-down.v1 | analytic | 3.326 | 3.326 | 0.000 | 0.000 | 1.6e-15 | 13.500 | 0.100 | 0.000 | 0 | 9434 |
-| step-up-down.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.500 | 0.100 | 3.452 | 0 | 0 |
-| bilateral-heel-raise.v1 | baseline (defaults) | 46.321 | 46.321 | 0.000 | 40.250 | 9.3e-16 | 0.030 | 0.003 | 0.000 | 0 | 0 |
-| bilateral-heel-raise.v1 | analytic | 0.000 | 0.000 | 0.000 | 0.000 | 1.1e-15 | 0.016 | 0.002 | 0.000 | 0 | 0 |
-| bilateral-heel-raise.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.1e-15 | 0.016 | 0.002 | 0.000 | 0 | 0 |
+| sit-to-stand.v1 | baseline (defaults) | 646.065 | 646.065 | 22.000 | 477.701 | 1.4e-15 | 0.198 | 0.050 | 0.000 | 0 | 0 |
+| sit-to-stand.v1 | analytic | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.249 | 0.050 | 0.000 | 0 | 0 |
+| sit-to-stand.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.249 | 0.050 | 0.000 | 0 | 0 |
+| bilateral-squat.v1 | baseline (defaults) | 507.463 | 507.463 | 16.500 | 0.000 | 1.9e-15 | 0.236 | 0.041 | 0.000 | 0 | 0 |
+| bilateral-squat.v1 | analytic | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.114 | 0.012 | 0.000 | 0 | 0 |
+| bilateral-squat.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.114 | 0.012 | 0.000 | 0 | 0 |
+| step-up-down.v1 | baseline (defaults) | 443.632 | 470.213 | 5.500 | 34.351 | 9.3e-16 | 0.689 | 0.054 | 0.000 | 0 | 0 |
+| step-up-down.v1 | analytic | 3.326 | 3.326 | 0.000 | 0.000 | 1.6e-15 | 23.001 | 0.050 | 0.000 | 0 | 9434 |
+| step-up-down.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.6e-15 | 0.353 | 0.050 | 3.452 | 0 | 0 |
+| bilateral-heel-raise.v1 | baseline (defaults) | 46.321 | 46.321 | 0.000 | 40.250 | 9.3e-16 | 0.061 | 0.006 | 0.000 | 0 | 0 |
+| bilateral-heel-raise.v1 | analytic | 0.000 | 0.000 | 0.000 | 0.000 | 1.1e-15 | 0.033 | 0.004 | 0.000 | 0 | 0 |
+| bilateral-heel-raise.v1 | stabilized | 0.000 | 0.000 | 0.000 | 0.000 | 1.1e-15 | 0.033 | 0.004 | 0.000 | 0 | 0 |
 
 ## Tier 1 → tier 2 (does the stabiliser earn its complexity?)
 
@@ -35,7 +35,7 @@ Sampling: tiers 1 and 2 at 240 Hz (streamed), baseline at 60 Hz (defaults only).
 |---|---|---|---|---|---|
 | sit-to-stand.v1 | 120 | 120 | 120 | 0 | — |
 | bilateral-squat.v1 | 128 | 128 | 128 | 0 | — |
-| step-up-down.v1 | 133 | 14 | 133 | 132 | 1.196 |
+| step-up-down.v1 | 133 | 14 | 133 | 133 | 1.196 |
 | bilateral-heel-raise.v1 | 88 | 88 | 88 | 0 | — |
 
 ## Rejected configurations (explicit diagnostics, no motion produced)

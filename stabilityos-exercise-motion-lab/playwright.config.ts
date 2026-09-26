@@ -15,10 +15,14 @@ export default defineConfig({
     launchOptions: { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
   },
   webServer: {
+    // `npm run preview` binds 127.0.0.1 explicitly: a bare `localhost` can resolve to ::1 first
+    // (e.g. GitHub's Ubuntu runners), leaving this IPv4 URL unreachable until the timeout.
     command: 'npm run build && npm run preview',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: true,
     timeout: 240_000,
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
   projects: [
     { name: 'workbench', testIgnore: /render-bench/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },

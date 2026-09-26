@@ -12,7 +12,8 @@ committed tree.
 | 5 | Rig adapter (rigs B/C), two-rate continuity analysis, sweep + solver-bench scripts | `183c66d` |
 | 6 | Validation suite (862 tests) and fixes for the 10 defects it found; rig adapter; export path | `fc40499` |
 | 7 | Workbench + render adapter + Playwright (19 tests) + render bench | `b754bbe` |
-| 8 | Final sweep (488 configs, 0 silent failures), solver optimisation (bitwise-identical, −32–36 % sample cost), benchmarks, validation write-up | see `git log` |
+| 8 | Final sweep (488 configs, 0 silent failures), solver optimisation (bitwise-identical, −32–36 % sample cost), benchmarks, validation write-up | `7a6b3df` |
+| 9 | Improvement round: split-safe continuity estimator, continuous stabiliser activation, GitHub Actions CI, runnable host-integration example, evidence index, README tour, CI fix (preview bound to 127.0.0.1); reverse playback in the player clock (tested; no UI control yet). **Not done yet:** contact shadows in the renderer (pure geometry module `src/render/contactShadowMath.ts` added, not wired or tested), off-main-thread compile, keyboard-operable timeline | `f46ba7b` and later (see `git log`) |
 
 ## Work organisation
 
@@ -41,6 +42,15 @@ workbench + render adapter + Playwright tests, and the recipe validation suite.
   the cost of ~0.1–0.2 s compile time.
 * The stabilised tier reuses its Δ = 0 leg solutions (was solving each leg up to 3× per sample):
   output verified bitwise-identical; sample cost −32–36 %, compile −16–26 %.
+* Continuity estimator corrected: the step-up's reported "0.4997 rad/s near-limit jump" scaled
+  exactly with the sampling step (0.62 → 0.157 → 0.039 rad/s at 240/960/3 840 Hz), i.e. smooth
+  ≈ 150 rad/s² swing-knee acceleration, not a break. Worse, injected tests showed the old estimator
+  could hide real breaks up to ~2× tolerance when they fell between samples (14 of 20 cases failed).
+  The new estimator refines every value above ¼ tolerance by measuring the velocity change across
+  adjacent stencils at h/8 and counts unrefined values twice, so failing breaks cannot hide.
+* Stabiliser activation now uses the same threshold it solves to: activating only above 1e-6 but
+  solving to 1e-9 produced a ~1e-4 rad knee step at activation (visible only at 15 kHz sampling as a
+  0.81 rad/s spike; the spike vanished after the fix and remaining maxima scale as pure acceleration).
 
 ## Budget
 

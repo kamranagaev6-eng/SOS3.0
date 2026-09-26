@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { compileRecipe, createRigA, getRecipe, samplePose } from '../../src/core/engine.ts';
 import { createPlayer, phaseIndexAt, type PhaseSpan } from '../../src/player/index.ts';
 
 function fakeClock(start = 1000) {
@@ -189,3 +190,127 @@ describe('player clock', () => {
     expect(p.snapshot()).toMatchObject({ speed: 1, t: 1 });
   });
 });
+
+describe('player clock: reverse playback', () => {
+  it('plays backwards from mid-clip: t = t0 - elapsed * |speed|', () => {
+    const c = fakeClock();
+    const p = createPlayer({ duration: 4, now: c.now, loop: false });
+    p.seek(3);
+    p.setSpeed(-1);
+    expect(p.snapshot()).toMatchObject({ speed: -1, direction: -1, playing: false });
+    p.play();
+    c.advance(500);
+    expect(p.time()).toBeCloseTo(2.5, 12);
+    // Half speed in reverse, re-anchored without a jump.
+    p.setSpeed(-0.5);
+    expect(p.time()).toBeCloseTo(2.5, 12);
+    c.advance(1000);
+    expect(p.time()).toBeCloseTo(2, 12);
+    // Direction flips keep |speed| and continue from the same t.
+    p.setDirection(1);
+    expect(p.snapshot()).toMatchObject({ speed: 0.5, direction: 1 });
+    c.advance(1000);
+    expect(p.time()).toBeCloseTo(2.5, 12);
+    p.setDirection(-1);
+    expect(p.snapshot().speed).toBe(-0.5);
+  });
+
+  it('stops at t = 0 without loop and marks the playback ended', () => {
+    const c = fakeClock();
+    const events: boolean[] = [];
+    const p = createPlayer({ duration: 4, now: c.now, loop: false });
+    p.seek(1);
+    p.setSpeed(-2);
+    p.subscribe((s) => events.push(s.playing));
+    p.play();
+    c.advance(400);
+    expect(p.time()).toBeCloseTo(0.2, 12);
+    c.advance(400);
+    expect(p.time()).toBe(0);
+    expect(p.snapshot()).toMatchObject({ playing: false, ended: true, t: 0 });
+    c.advance(1000);
+    expect(p.time()).toBe(0);
+    expect(events).toEqual([true, false]);
+  });
+
+  it('play at t = 0 in reverse (no loop) starts from the end, as forward play at the end restarts', () => {
+    const c = fakeClock();
+    const p = createPlayer({ duration: 4, now: c.now, loop: false });
+    p.setSpeed(-1);
+    p.play();
+    expect(p.time()).toBe(4);
+    c.advance(250);
+    expect(p.time()).toBeCloseTo(3.75, 12);
+    // Run into t = 0, then press play again: restarts from the end.
+    c.advance(5000);
+    expect(p.time()).toBe(0);
+    p.play();
+    expect(p.time()).toBe(4);
+    expect(p.snapshot().ended).toBe(false);
+  });
+
+  it('wraps below zero when looping', () => {
+    const c = fakeClock();
+    const p = createPlayer({ duration: 2, now: c.now, loop: true });
+    p.seek(0.5);
+    p.setSpeed(-1);
+    p.play();
+    c.advance(1000);
+    expect(p.time()).toBeCloseTo(1.5, 12);
+    expect(p.snapshot().playing).toBe(true);
+    c.advance(3300); // 1.5 - 3.3 = -1.8 -> 0.2
+    expect(p.time()).toBeCloseTo(0.2, 9);
+    // Looping reverse from t = 0 simply wraps to the end.
+    p.pause();
+    p.seek(0);
+    p.play();
+    c.advance(100);
+    expect(p.time()).toBeCloseTo(1.9, 12);
+  });
+
+  it('rejects zero and non-finite speeds but accepts negative ones', () => {
+    const c = fakeClock();
+    const p = createPlayer({ duration: 5, now: c.now });
+    p.setSpeed(-0.25);
+    p.setSpeed(0);
+    p.setSpeed(Number.NEGATIVE_INFINITY);
+    expect(p.snapshot()).toMatchObject({ speed: -0.25, direction: -1 });
+    expect(createPlayer({ duration: 1, now: c.now, speed: 0 }).snapshot().speed).toBe(1);
+  });
+
+  it('t is computed, never accumulated: reverse after irregular frames equals one jump, and gives the same pose as forward', () => {
+    // Reverse with irregular frame queries lands exactly where a single jump does.
+    const c = fakeClock();
+    const p = createPlayer({ duration: 6, now: c.now, loop: false });
+    p.seek(3);
+    p.setSpeed(-1);
+    p.play();
+    let jitter = 0;
+    for (let i = 1; i <= 750; i++) {
+      jitter = (jitter * 7 + 3) % 11;
+      c.set(1000 + i * 2 + (i === 750 ? 0 : jitter * 0.1));
+      p.time();
+    }
+    const reverse = p.time();
+    expect(reverse).toBe(3 - 1.5);
+
+    // Forward to the same instant: bitwise the same t, hence the same (pure) engine sample.
+    const c2 = fakeClock();
+    const f = createPlayer({ duration: 6, now: c2.now, loop: false });
+    f.play();
+    for (let i = 1; i <= 375; i++) {
+      c2.set(1000 + i * 4 - (i % 3) * 0.7);
+      f.time();
+    }
+    c2.set(2500);
+    const forward = f.time();
+    expect(forward).toBe(reverse);
+
+    const rig = createRigA();
+    const recipe = getRecipe('bilateral-heel-raise.v1')!;
+    const res = compileRecipe(recipe.id, recipe.defaults(), rig);
+    if (!res.ok) throw new Error('heel raise did not compile');
+    expect(samplePose(res.plan, rig, reverse, 'stabilized')).toEqual(samplePose(res.plan, rig, forward, 'stabilized'));
+  });
+});
+
