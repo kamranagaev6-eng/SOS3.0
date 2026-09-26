@@ -1,9 +1,13 @@
 import { diag } from '../contracts/diagnostics.ts';
 import type { ParamRecord } from '../contracts/recipe.ts';
 import type { RigDefinition } from '../contracts/rig.ts';
+import { heelRaiseRecipe } from './heelRaise.ts';
+import { sitToStandRecipe } from './sitToStand.ts';
+import { squatRecipe } from './squat.ts';
+import { stepUpDownRecipe } from './stepUpDown.ts';
 import type { CompileResult, RecipeDefinition } from './types.ts';
 
-const RECIPES: RecipeDefinition[] = [];
+const RECIPES: RecipeDefinition[] = [sitToStandRecipe, squatRecipe, stepUpDownRecipe, heelRaiseRecipe];
 
 export function listRecipes(): readonly RecipeDefinition[] {
   return RECIPES;

@@ -79,6 +79,9 @@ export const swingStateSchema = z.object({
   horizontalDelay: z.number().min(0).max(0.6),
   /** Fraction of the swing reserved at the end for vertical settling (horizontal done early). */
   horizontalLead: z.number().min(0).max(0.6),
+  /** Vertical profile: rise to the peak over [0, riseEnd], hold, descend over [descendStart, 1]. */
+  riseEnd: z.number().min(0.05).max(0.95),
+  descendStart: z.number().min(0.05).max(0.95),
 });
 export const footStateSchema = z.discriminatedUnion('kind', [flatStateSchema, forefootStateSchema, swingStateSchema]);
 export type FootState = z.infer<typeof footStateSchema>;

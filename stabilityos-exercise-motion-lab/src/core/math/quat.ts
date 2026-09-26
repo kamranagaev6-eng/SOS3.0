@@ -67,8 +67,9 @@ export function quatRotateVec3(q: Quat, v: Vec3): Vec3 {
 
 /** Geodesic angle between two rotations, in [0, pi]. */
 export function quatAngleBetween(a: Quat, b: Quat): number {
-  const d = Math.min(1, Math.abs(quatDot(a, b)));
-  return 2 * Math.acos(d);
+  // 2·atan2(|vec(a* b)|, |w(a* b)|): full precision for tiny angles (acos loses ~3e-8 rad).
+  const d = quatMultiply(quatConjugate(a), b);
+  return 2 * Math.atan2(Math.hypot(d[0], d[1], d[2]), Math.abs(d[3]));
 }
 
 export function mat3FromQuat(q: Quat): Mat3 {
@@ -132,7 +133,7 @@ export function quatSlerp(a: Quat, b0: Quat, t: number): Quat {
 /** Rotation taking unit vector `from` to unit vector `to` along the shortest arc. */
 export function quatFromUnitVectors(from: Vec3, to: Vec3): Quat {
   const d = from[0] * to[0] + from[1] * to[1] + from[2] * to[2];
-  if (d < -1 + 1e-12) {
+  if (d < -1 + 1e-15) {
     // 180 degrees: pick any axis orthogonal to `from`.
     const axis: Vec3 = Math.abs(from[0]) < 0.9 ? [0, -from[2], from[1]] : [-from[2], 0, from[0]];
     const l = Math.hypot(axis[0], axis[1], axis[2]);

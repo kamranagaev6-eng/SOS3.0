@@ -1,5 +1,5 @@
 import type { JointSpec, RigDefinition } from '../contracts/rig.ts';
-import { eulerFromMat3 } from '../math/euler.ts';
+import { eulerAlternate, eulerFromMat3 } from '../math/euler.ts';
 import { IDENTITY_Q, mat3FromQuat, quatCanonical, quatFromAxisAngle, quatMultiply, quatRotateVec3, type Quat } from '../math/quat.ts';
 import { add, type Vec3 } from '../math/vec3.ts';
 
@@ -21,7 +21,7 @@ export interface RigModel {
 
 const cache = new WeakMap<RigDefinition, RigModel>();
 
-/** Requires joints in topological order (parents first); validateRig() reports violations. */
+/** Requires joints in topological order (parents first); validateRig() in rig/validate.ts reports violations. */
 export function getRigModel(rig: RigDefinition): RigModel {
   const hit = cache.get(rig);
   if (hit) return hit;
@@ -97,15 +97,32 @@ export function composeJointRotation(joint: JointSpec, angles: readonly number[]
  * representable by the joint (e.g. twist about the shank for a 2-DOF ankle).
  */
 export function decomposeJointRotation(joint: JointSpec, q: Quat): { angles: number[]; residual: number[] } {
-  const e = eulerFromMat3(joint.order, mat3FromQuat(q));
-  const angles: number[] = [];
-  const residual: number[] = [];
-  for (let i = 0; i < 3; i++) {
-    const d = joint.dofs[i];
-    if (d) angles.push(d.sign * e[i]!);
-    else residual.push(e[i]!);
-  }
-  return { angles, residual };
+  // Two Tait–Bryan branches describe the same rotation. The canonical branch keeps the middle
+  // angle in [-π/2, π/2], which cannot express e.g. 120° shoulder abduction (middle DOF of X-Z-Y).
+  // Pick the branch with the smallest (limit excess + off-axis residual); ties keep the canonical one.
+  const e0 = eulerFromMat3(joint.order, mat3FromQuat(q));
+  const e1 = eulerAlternate(e0);
+  const split = (e: readonly number[]) => {
+    const angles: number[] = [];
+    const residual: number[] = [];
+    let cost = 0;
+    for (let i = 0; i < 3; i++) {
+      const d = joint.dofs[i];
+      if (d) {
+        const a = d.sign * e[i]!;
+        angles.push(a);
+        cost += a > d.max ? a - d.max : a < d.min ? d.min - a : 0;
+      } else {
+        residual.push(e[i]!);
+        cost += Math.abs(e[i]!);
+      }
+    }
+    return { angles, residual, cost };
+  };
+  const b0 = split(e0);
+  const b1 = split(e1);
+  const pick = b1.cost < b0.cost - 1e-12 ? b1 : b0;
+  return { angles: pick.angles, residual: pick.residual };
 }
 
 export interface FkResult {
@@ -147,8 +164,9 @@ export function forwardKinematics(
 
 /** Deterministic key-order-independent JSON used for fingerprints and hashes. */
 export function stableStringify(value: unknown): string {
+  if (value === undefined || typeof value === 'function' || typeof value === 'symbol') return 'null';
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (Array.isArray(value)) return `[${value.map((v) => stableStringify(v)).join(',')}]`;
   const obj = value as Record<string, unknown>;
   return `{${Object.keys(obj)
     .sort()

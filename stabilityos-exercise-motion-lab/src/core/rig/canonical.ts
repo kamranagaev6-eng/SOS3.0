@@ -257,7 +257,7 @@ export function buildCanonicalRig(id: string, name: string, p: HumanoidProportio
 
 /** Rig A: the default synthetic humanoid. */
 export function createRigA(): RigDefinition {
-  return buildCanonicalRig('synthetic-rig-a', 'Synthetic rig A (canonical, 1.73 m)', PROPORTIONS_A);
+  return buildCanonicalRig('synthetic-rig-a', `Synthetic rig A (canonical, ${standingHeight(PROPORTIONS_A).toFixed(2)} m)`, PROPORTIONS_A);
 }
 
 /** Uniformly/anisotropically scaled proportions for proportion sweeps in tests and demos. */
@@ -309,4 +309,13 @@ export function mirrorProportions(p: HumanoidProportions): HumanoidProportions {
   out.left = structuredClone(p.right);
   out.right = structuredClone(p.left);
   return out;
+}
+
+/** Standing height to the head_top site in the rest pose (left leg). */
+export function standingHeight(p: HumanoidProportions): number {
+  const L = p.left.leg;
+  return (
+    L.thigh + L.shank + L.ankleHeight + p.pelvis.hipDrop + p.pelvis.lumbarBaseHeight +
+    p.trunk.lumbar + p.trunk.thoracic + p.trunk.neck + p.trunk.head
+  );
 }

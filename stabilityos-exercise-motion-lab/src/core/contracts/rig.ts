@@ -42,7 +42,8 @@ export type DofSpec = z.infer<typeof dofSchema>;
 export const jointKindSchema = z.enum(['root', 'pelvis', 'ball', 'universal', 'hinge']);
 export type JointKind = z.infer<typeof jointKindSchema>;
 
-export const jointSchema = z.object({
+export const jointSchema = z
+  .object({
   name: identifier,
   parent: identifier.nullable(),
   kind: jointKindSchema,
@@ -51,7 +52,10 @@ export const jointSchema = z.object({
   offset: vec3Schema,
   dofs: z.array(dofSchema).max(3),
   order: z.tuple([axisIndexSchema, axisIndexSchema, axisIndexSchema]),
-});
+})
+  .refine((j) => new Set(j.order).size === 3, { message: 'joint order must list three distinct axes', path: ['order'] })
+  .refine((j) => j.dofs.every((d, i) => d.axis === j.order[i]), { message: 'dof i must rotate about order[i]', path: ['dofs'] })
+  .refine((j) => new Set(j.dofs.map((d) => d.name)).size === j.dofs.length, { message: 'duplicate dof names', path: ['dofs'] });
 export type JointSpec = z.infer<typeof jointSchema>;
 
 export const siteSchema = z.object({
@@ -108,7 +112,8 @@ export const proportionsSchema = z.object({
 });
 export type HumanoidProportions = z.infer<typeof proportionsSchema>;
 
-export const rigSchema = z.object({
+export const rigSchema = z
+  .object({
   schema: z.literal(SCHEMA.rig),
   id: identifier,
   name: z.string().min(1).max(120),
@@ -120,7 +125,15 @@ export const rigSchema = z.object({
   capabilities: z.array(capabilitySchema),
   /** Visual radii for the stylised renderer only; never used by the solver. */
   visualRadius: z.record(z.string(), positive),
-});
+})
+  .refine((r) => new Set(r.joints.map((j) => j.name)).size === r.joints.length, { message: 'duplicate joint names', path: ['joints'] })
+  .refine((r) => new Set(r.sites.map((x) => x.name)).size === r.sites.length, { message: 'duplicate site names', path: ['sites'] })
+  .refine(
+    (r) => r.joints.every((j, i) => j.parent === null || r.joints.slice(0, i).some((p) => p.name === j.parent)),
+    { message: 'every joint parent must exist and precede the joint (topological order)', path: ['joints'] },
+  )
+  .refine((r) => r.joints.filter((j) => j.parent === null).length === 1, { message: 'exactly one root joint required', path: ['joints'] })
+  .refine((r) => r.sites.every((x) => r.joints.some((j) => j.name === x.joint)), { message: 'site attached to unknown joint', path: ['sites'] });
 export type RigDefinition = z.infer<typeof rigSchema>;
 
 export const legSideSchema = sideSchema;
