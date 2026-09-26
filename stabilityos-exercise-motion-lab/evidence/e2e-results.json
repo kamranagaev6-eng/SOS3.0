@@ -1,0 +1,756 @@
+{
+  "config": {
+    "configFile": "/home/user/SOS3.0/stabilityos-exercise-motion-lab/playwright.config.ts",
+    "rootDir": "/home/user/SOS3.0/stabilityos-exercise-motion-lab/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "evidence/e2e-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/user/SOS3.0/stabilityos-exercise-motion-lab/evidence/playwright-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "workbench",
+        "name": "workbench",
+        "testDir": "/home/user/SOS3.0/stabilityos-exercise-motion-lab/e2e",
+        "testIgnore": [
+          "/render-bench/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/home/user/SOS3.0/stabilityos-exercise-motion-lab/evidence/playwright-output",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "bench",
+        "name": "bench",
+        "testDir": "/home/user/SOS3.0/stabilityos-exercise-motion-lab/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/render-bench/"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run build && npm run preview",
+      "url": "http://127.0.0.1:4173",
+      "reuseExistingServer": true,
+      "timeout": 240000
+    }
+  },
+  "suites": [
+    {
+      "title": "workbench.spec.ts",
+      "file": "workbench.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "workbench",
+          "file": "workbench.spec.ts",
+          "line": 80,
+          "column": 6,
+          "specs": [
+            {
+              "title": "loads with the persistent synthetic badge and a working WebGL stage",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1834,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:17:57.824Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-f56b99cba7401f4a2cf2",
+              "file": "workbench.spec.ts",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "recipe sit-to-stand.v1: timeline, keyboard, scrubbing, speed, views, overlays, comparison, params",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8599,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:17:59.742Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-94c6ba60e0f50ae9b9cd",
+              "file": "workbench.spec.ts",
+              "line": 102,
+              "column": 5
+            },
+            {
+              "title": "recipe bilateral-squat.v1: timeline, keyboard, scrubbing, speed, views, overlays, comparison, params",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8340,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:08.356Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-2e717e6b83ba82f551d6",
+              "file": "workbench.spec.ts",
+              "line": 102,
+              "column": 5
+            },
+            {
+              "title": "recipe step-up-down.v1: timeline, keyboard, scrubbing, speed, views, overlays, comparison, params",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8956,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:16.705Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-3043fad613b551fb18b6",
+              "file": "workbench.spec.ts",
+              "line": 102,
+              "column": 5
+            },
+            {
+              "title": "recipe bilateral-heel-raise.v1: timeline, keyboard, scrubbing, speed, views, overlays, comparison, params",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8655,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:25.671Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-bd17779f01dc8bc756ad",
+              "file": "workbench.spec.ts",
+              "line": 102,
+              "column": 5
+            },
+            {
+              "title": "step-up/down: changing the leading side recompiles the plan",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4118,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:34.334Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-2b938898dcef6ab9729e",
+              "file": "workbench.spec.ts",
+              "line": 270,
+              "column": 3
+            },
+            {
+              "title": "comparison view: bilateral-squat.v1 baseline vs stabilized",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2559,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:38.463Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-b6a2e2302c34d5f0fe09",
+              "file": "workbench.spec.ts",
+              "line": 301,
+              "column": 5
+            },
+            {
+              "title": "comparison view: sit-to-stand.v1 baseline vs stabilized",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2696,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:41.038Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-3494bd971fdbc48e2b4d",
+              "file": "workbench.spec.ts",
+              "line": 301,
+              "column": 5
+            },
+            {
+              "title": "reduced motion: static inspection, no autoplay, key poses seek",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3065,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:43.747Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-b5413fb724fe0695fcda",
+              "file": "workbench.spec.ts",
+              "line": 326,
+              "column": 3
+            },
+            {
+              "title": "mobile 390×844: stacked layout without horizontal scroll",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3435,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:46.822Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-64448b07ef294df2dca5",
+              "file": "workbench.spec.ts",
+              "line": 358,
+              "column": 3
+            },
+            {
+              "title": "rig B (adapted host skeleton) plays; rig C shows actionable incompatibility diagnostics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3578,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:50.265Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-adb56bee42d93aa5d8f0",
+              "file": "workbench.spec.ts",
+              "line": 402,
+              "column": 3
+            },
+            {
+              "title": "recipe JSON export → import round trip; malformed import shows readable errors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3156,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:53.857Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-c61e891ae6427662e85c",
+              "file": "workbench.spec.ts",
+              "line": 443,
+              "column": 3
+            },
+            {
+              "title": "glb export downloads animation + manifest; round-trip verify is within tolerance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4131,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:18:57.025Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-be7b9e0cad1c63d06c57",
+              "file": "workbench.spec.ts",
+              "line": 492,
+              "column": 3
+            },
+            {
+              "title": "resource hygiene: switching recipes, rigs and comparison does not grow GPU or owned resources",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13387,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:19:01.164Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-afa85dcede69dc992a8e",
+              "file": "workbench.spec.ts",
+              "line": 533,
+              "column": 3
+            },
+            {
+              "title": "dark colour scheme renders with the same controls",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2714,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:19:14.560Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-28773f1245ae38b3f513",
+              "file": "workbench.spec.ts",
+              "line": 597,
+              "column": 3
+            },
+            {
+              "title": "keyboard help popover documents shortcuts and closes with Escape",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1016,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:19:17.284Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-fa88a3b694a2b705562e",
+              "file": "workbench.spec.ts",
+              "line": 615,
+              "column": 3
+            },
+            {
+              "title": "all interactive controls have accessible names",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1168,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:19:18.309Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-4285a2fd281b11534fa9",
+              "file": "workbench.spec.ts",
+              "line": 630,
+              "column": 3
+            },
+            {
+              "title": "WebGL unavailable: readable error, numerical panels keep working",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2621,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:19:19.492Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-0a260b82c0b2c61a381d",
+              "file": "workbench.spec.ts",
+              "line": 651,
+              "column": 3
+            },
+            {
+              "title": "compile failures and infeasible plans are shown with diagnostics, never as a silent motion",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "workbench",
+                  "projectName": "workbench",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2754,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-26T03:19:22.123Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "921e070f285a8b470d11-37c25c0aaf237b06081f",
+              "file": "workbench.spec.ts",
+              "line": 673,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-26T03:17:57.124Z",
+    "duration": 88371.046,
+    "expected": 19,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

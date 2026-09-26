@@ -495,6 +495,19 @@ test.describe('workbench', () => {
     expect(errors).toEqual([]);
   });
 
+  test('dark colour scheme renders with the same controls', async ({ page }) => {
+    const errors = trackConsole(page);
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('/?recipe=bilateral-squat.v1');
+    await ready(page, 'bilateral-squat.v1');
+    await page.evaluate(() => window.__motionLab!.seek(3.2));
+    await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).not.toBe('rgb(243, 245, 248)');
+    await shot(page, 'dark-theme');
+    expect(errors).toEqual([]);
+  });
+
   test('keyboard help popover documents shortcuts and closes with Escape', async ({ page }) => {
     const errors = trackConsole(page);
     await page.goto('/');

@@ -21,7 +21,6 @@ import { StaticInspection } from './components/StaticInspection.tsx';
 import { Timeline } from './components/Timeline.tsx';
 import { Transport } from './components/Transport.tsx';
 import { useMediaQuery } from './hooks.ts';
-import { loadAdapterModule, moduleAvailability, type AdapterModule } from './optionalModules.ts';
 import { paramErrorsFromDiagnostics, rawFromRecord, validateParams, type RawParams } from './params.ts';
 import { resolveRig, RIG_A_ID, rigOptions } from './rigs.ts';
 import { installTestHook, shouldInstallTestHook } from './testHooks.ts';
@@ -79,24 +78,7 @@ export function App() {
 
   // ---------------- rig ----------------
   const [rigId, setRigId] = useState(RIG_A_ID);
-  const [adapterMod, setAdapterMod] = useState<AdapterModule | null>(null);
-  const [adapterLoading, setAdapterLoading] = useState(moduleAvailability.adapter);
-  useEffect(() => {
-    if (!moduleAvailability.adapter) return;
-    let alive = true;
-    loadAdapterModule()
-      .then((m) => {
-        if (alive) setAdapterMod(m);
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (alive) setAdapterLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  const resolved = useMemo(() => resolveRig(rigId, adapterMod, recipe?.requiredCapabilities ?? []), [rigId, adapterMod, recipe]);
+  const resolved = useMemo(() => resolveRig(rigId, recipe?.requiredCapabilities ?? []), [rigId, recipe]);
   const rig = resolved.status === 'ready' ? resolved.rig : null;
 
   // ---------------- compile ----------------
@@ -338,8 +320,6 @@ export function App() {
   let blocker: React.ReactNode = null;
   if (!recipe) {
     blocker = <BlockerMessage title="Recipe not available" diagnostics={[{ code: 'UNKNOWN_RECIPE', severity: 'error', message: `Recipe '${recipeId}' is not registered in this build.`, hint: 'Choose another recipe.' }]} testId="recipe-missing" />;
-  } else if (resolved.status === 'loading' || (resolved.status === 'unavailable' && adapterLoading)) {
-    blocker = <p className="muted">Loading rig adapter…</p>;
   } else if (resolved.status !== 'ready') {
     blocker = (
       <BlockerMessage
@@ -354,7 +334,7 @@ export function App() {
   }
   const infeasible = compile?.ok && compile.feasible === false;
   const phaseLabel = plan?.phases[readout.phaseIndex]?.label ?? null;
-  const rigOpts = rigOptions(adapterMod, adapterLoading);
+  const rigOpts = rigOptions();
 
   return (
     <div className="app">

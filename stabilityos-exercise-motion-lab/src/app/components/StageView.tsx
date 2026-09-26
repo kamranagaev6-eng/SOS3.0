@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Side } from '../../core/contracts/common.ts';
 import type { SolverTier } from '../../core/solver/types.ts';
-import { CONTACT_STATE_CSS, createStage, RESIDUAL_MAGNIFICATION, type OverlayFlags, type SplitLayout, type Stage, type ViewPreset } from '../../render/index.ts';
+import { CONTACT_STATE_CSS, createStage, RESIDUAL_MAGNIFICATION, StageUnavailableError, type OverlayFlags, type SplitLayout, type Stage, type ViewPreset } from '../../render/index.ts';
 import type { ViewerController } from '../viewer.ts';
 
 const TIER_LABEL: Record<SolverTier, string> = {
@@ -42,7 +42,7 @@ export function StageView(props: StageViewProps) {
     try {
       s = createStage(canvas, { reducedMotion: props.reducedMotion, onContextChange: setContextLost });
     } catch (e) {
-      const detail = e instanceof Error ? e.message : String(e);
+      const detail = e instanceof StageUnavailableError ? e.detail : e instanceof Error ? e.message : String(e);
       setUnavailable(detail);
       onAvailability(false, detail);
       return;

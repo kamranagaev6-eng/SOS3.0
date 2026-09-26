@@ -1,8 +1,7 @@
 import type { MotionPlan } from '../core/contracts/plan.ts';
 import type { RigDefinition } from '../core/contracts/rig.ts';
-import { samplePose } from '../core/engine.ts';
+import { analyzePlan, samplePose } from '../core/engine.ts';
 import type { Vec3 } from '../core/math/vec3.ts';
-import { analyzePlan } from '../core/metrics/analyze.ts';
 import type { ClipMetrics } from '../core/metrics/types.ts';
 import type { SolverTier } from '../core/solver/types.ts';
 
