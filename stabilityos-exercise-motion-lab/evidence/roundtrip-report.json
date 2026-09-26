@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-26T02:11:53.762Z",
+  "generatedAt": "2026-09-26T03:34:40.027Z",
   "reviewStatus": "unreviewed-synthetic",
   "reviewNotice": "UNREVIEWED SYNTHETIC ENGINEERING FIXTURE. Kinematic demonstration only: not a prescription, not a dose, not patient instruction, not validated for balance, loading, muscle activity, safety or clinical correctness. Exercise identity, approved instructions, dose, side and review authority must come from the host application.",
   "environment": {
@@ -34,31 +34,31 @@
       "frames": 250,
       "duration": 8.3,
       "glbBytes": 177092,
-      "manifestBytes": 9570,
-      "sha256": "11c55fd73775b67b67b222340fb0cf7c961813d5bd564c8cdd188747498e2d04",
-      "maxPositionError": 1.3868821515803805e-7,
+      "manifestBytes": 9409,
+      "sha256": "5eda81dc8dd5f23c3bd7e0187e55bd128e8fc69182c5902a9defe992cb7d0d22",
+      "maxPositionError": 1.4716291680483733e-7,
       "maxRootError": 7.818276748228215e-8,
       "maxRotationError": 3.239562270662702e-7,
-      "maxWorldRotationError": 2.871978543388516e-7,
-      "maxBoneLengthRelError": 7.769439110160226e-8,
-      "importedMinConsecutiveDot": 0.9993824763602017,
+      "maxWorldRotationError": 3.2504473820031115e-7,
+      "maxBoneLengthRelError": 5.928120178207185e-8,
+      "importedMinConsecutiveDot": 0.9993818640035212,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 4.027325339290947,
+        "maxStepDeg": 4.029323459938917,
         "maxStepAllowedDeg": 20,
-        "minConsecutiveDot": 0.9993824765211747,
+        "minConsecutiveDot": 0.9993818636750624,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.0011276752826769004,
-        "maxRotationError": 0.002402244246872804
+        "maxPositionError": 0.0011281927323275231,
+        "maxRotationError": 0.002403721143083376
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 116.45427000000001
+      "exportMs": 217.880023
     },
     {
       "kind": "recipe",
@@ -69,31 +69,31 @@
       "frames": 499,
       "duration": 8.3,
       "glbBytes": 279692,
-      "manifestBytes": 9534,
-      "sha256": "2bf3846a193845e785dd2a78e8a47cbfcd30114d80dfce7678c991b6a16a0158",
-      "maxPositionError": 1.38295555444299e-7,
+      "manifestBytes": 9376,
+      "sha256": "fee037ee5ba368a96826cf9c430418093639fa973980e393637b947fa874ec90",
+      "maxPositionError": 1.4672655366115586e-7,
       "maxRootError": 7.960244652327475e-8,
       "maxRotationError": 3.229106771973647e-7,
-      "maxWorldRotationError": 3.2046812579972265e-7,
+      "maxWorldRotationError": 3.2367612518236124e-7,
       "maxBoneLengthRelError": 5.259992105959753e-8,
-      "importedMinConsecutiveDot": 0.9998406715547329,
+      "importedMinConsecutiveDot": 0.9998405075219978,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 2.0455952781555693,
+        "maxStepDeg": 2.046649785987219,
         "maxStepAllowedDeg": 10,
-        "minConsecutiveDot": 0.9998406718034425,
+        "minConsecutiveDot": 0.9998405074975594,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.0002816791365341474,
-        "maxRotationError": 0.0005979858810615279
+        "maxPositionError": 0.00028182774586865743,
+        "maxRotationError": 0.0005983224142721126
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 97.14844600000004,
+      "exportMs": 195.02965700000004,
       "sampleFiles": {
         "glb": "evidence/exports/sit-to-stand.v1.glb",
         "manifest": "evidence/exports/sit-to-stand.v1.manifest.json"
@@ -108,31 +108,31 @@
       "frames": 349,
       "duration": 11.6,
       "glbBytes": 217912,
-      "manifestBytes": 9241,
-      "sha256": "f2d01bff7c05274befaff71e7156da1b261f97f48794afd116520b51ba76845c",
-      "maxPositionError": 1.3173235529510694e-7,
+      "manifestBytes": 9113,
+      "sha256": "05918b5ebc974d20381e33cc3bfb144a90a0fdc8e450cae0794e53c5b4bac83f",
+      "maxPositionError": 1.3428469093104877e-7,
       "maxRootError": 5.754323521844906e-8,
-      "maxRotationError": 4.0237208878690915e-7,
-      "maxWorldRotationError": 2.649170956501214e-7,
+      "maxRotationError": 4.090211584983933e-7,
+      "maxWorldRotationError": 2.666334761081311e-7,
       "maxBoneLengthRelError": 3.660198342631097e-8,
-      "importedMinConsecutiveDot": 0.9998473710256991,
+      "importedMinConsecutiveDot": 0.9998599950894993,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 2.0021276668444488,
+        "maxStepDeg": 1.9175398023407404,
         "maxStepAllowedDeg": 20,
-        "minConsecutiveDot": 0.9998473709383034,
+        "minConsecutiveDot": 0.9998599950506674,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.00029713177290122155,
-        "maxRotationError": 0.001430029024750267
+        "maxPositionError": 0.0003209390521975979,
+        "maxRotationError": 0.0015620868391747298
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 78.52058599999998
+      "exportMs": 236.735721
     },
     {
       "kind": "recipe",
@@ -142,32 +142,32 @@
       "status": "pass",
       "frames": 697,
       "duration": 11.6,
-      "glbBytes": 361320,
-      "manifestBytes": 9211,
-      "sha256": "dec9ba0124472750453b590ffede50dec7e8a20852c67b4efb654f80c3d9df28",
-      "maxPositionError": 1.3768683794116753e-7,
+      "glbBytes": 361316,
+      "manifestBytes": 9082,
+      "sha256": "378a31d05d42b48d2c121052734e9280d3956a68492f85c7b64bfb8ae647efa4",
+      "maxPositionError": 1.4877168177271553e-7,
       "maxRootError": 5.9590772615025767e-8,
-      "maxRotationError": 4.619441776876384e-7,
-      "maxWorldRotationError": 2.6443878934707207e-7,
+      "maxRotationError": 4.5384272112647786e-7,
+      "maxWorldRotationError": 2.669995817396972e-7,
       "maxBoneLengthRelError": 3.660198342631097e-8,
-      "importedMinConsecutiveDot": 0.9999618294288505,
+      "importedMinConsecutiveDot": 0.9999649566253558,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 1.0012301504173287,
+        "maxStepDeg": 0.9593387201291226,
         "maxStepAllowedDeg": 10,
-        "minConsecutiveDot": 0.99996182932643,
+        "minConsecutiveDot": 0.9999649566062333,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.0000836716127234107,
-        "maxRotationError": 0.0004018781218998037
+        "maxPositionError": 0.00008394216004002266,
+        "maxRotationError": 0.00040784427175457493
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 128.03313000000003,
+      "exportMs": 256.97719099999995,
       "sampleFiles": {
         "glb": "evidence/exports/bilateral-squat.v1.glb",
         "manifest": "evidence/exports/bilateral-squat.v1.manifest.json"
@@ -181,32 +181,32 @@
       "status": "pass",
       "frames": 325,
       "duration": 10.8,
-      "glbBytes": 208044,
-      "manifestBytes": 14113,
-      "sha256": "9065d002963403742110d6e90491128fe1f33348e9268951a7621c93a09c4179",
-      "maxPositionError": 5.229290208360462e-7,
-      "maxRootError": 1.178989371987113e-7,
-      "maxRotationError": 0.000001857266271660147,
-      "maxWorldRotationError": 9.681335150536591e-7,
-      "maxBoneLengthRelError": 2.8983006305016453e-8,
-      "importedMinConsecutiveDot": 0.996232348137232,
+      "glbBytes": 208024,
+      "manifestBytes": 13877,
+      "sha256": "6ad4eba4cf1ae92b603685d6384fddeb104d4c1eda7bd525c4bbf3532878f032",
+      "maxPositionError": 6.109550776467768e-7,
+      "maxRootError": 1.167127666995828e-7,
+      "maxRotationError": 0.0000024198998502174956,
+      "maxWorldRotationError": 0.0000012397738731112831,
+      "maxBoneLengthRelError": 2.9289929525705288e-8,
+      "importedMinConsecutiveDot": 0.9941490587923196,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 9.950374858654163,
+        "maxStepDeg": 12.402023632535611,
         "maxStepAllowedDeg": 20,
-        "minConsecutiveDot": 0.9962323484342831,
+        "minConsecutiveDot": 0.9941490565999439,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.006003572041779477,
-        "maxRotationError": 0.01550239097041843
+        "maxPositionError": 0.003862520141279907,
+        "maxRotationError": 0.017728071451049623
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 70.98875899999996
+      "exportMs": 296.70661100000007
     },
     {
       "kind": "recipe",
@@ -216,32 +216,32 @@
       "status": "pass",
       "frames": 649,
       "duration": 10.8,
-      "glbBytes": 341560,
-      "manifestBytes": 14097,
-      "sha256": "7515bb1687e1ab864828eae3de5876324d2e3f108bd81c1bad1c6e8f9ee1a254",
-      "maxPositionError": 5.194036927641916e-7,
-      "maxRootError": 1.7458922962801552e-7,
-      "maxRotationError": 0.0000019170064251695344,
-      "maxWorldRotationError": 9.93199327912614e-7,
-      "maxBoneLengthRelError": 2.862697301431183e-8,
-      "importedMinConsecutiveDot": 0.9990539977043016,
+      "glbBytes": 341544,
+      "manifestBytes": 13844,
+      "sha256": "d560da717658fc751cead916b34676eadf4646893b1c40fb393b9b2f54a7dad5",
+      "maxPositionError": 6.143809356112286e-7,
+      "maxRootError": 1.695657540301971e-7,
+      "maxRotationError": 0.0000024667249143860285,
+      "maxWorldRotationError": 0.000001254938286886432,
+      "maxBoneLengthRelError": 2.6966444839400817e-8,
+      "importedMinConsecutiveDot": 0.9985090102538288,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 4.984799249886551,
+        "maxStepDeg": 6.258337019345543,
         "maxStepAllowedDeg": 10,
-        "minConsecutiveDot": 0.9990539989721736,
+        "minConsecutiveDot": 0.9985090101371399,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.006042979966661635,
-        "maxRotationError": 0.01555267493942671
+        "maxPositionError": 0.0010945420389316552,
+        "maxRotationError": 0.005028858008146111
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 136.5248919999999,
+      "exportMs": 268.664714,
       "sampleFiles": {
         "glb": "evidence/exports/step-up-down.v1.glb",
         "manifest": "evidence/exports/step-up-down.v1.manifest.json"
@@ -255,32 +255,32 @@
       "status": "pass",
       "frames": 331,
       "duration": 11,
-      "glbBytes": 210172,
-      "manifestBytes": 10899,
-      "sha256": "134d95e853f0a641cc2536bfb8eb0c5aeac74eb77b14115a407226f4b0444691",
-      "maxPositionError": 3.807975326861271e-8,
-      "maxRootError": 9.404082103314781e-9,
+      "glbBytes": 210176,
+      "manifestBytes": 10757,
+      "sha256": "2699b086dc36f6d6cac32ffb0497d565c6807a9c555a6f96809d60a0c1568e5a",
+      "maxPositionError": 4.110565772719678e-8,
+      "maxRootError": 7.919339892192845e-9,
       "maxRotationError": 1.1777506989107963e-7,
-      "maxWorldRotationError": 1.1389671136439851e-7,
+      "maxWorldRotationError": 1.0954842004086895e-7,
       "maxBoneLengthRelError": 5.507376036698968e-10,
-      "importedMinConsecutiveDot": 0.9999792327392051,
+      "importedMinConsecutiveDot": 0.9999788097987299,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 0.7385125972116869,
+        "maxStepDeg": 0.7459953975880805,
         "maxStepAllowedDeg": 20,
-        "minConsecutiveDot": 0.9999792327466829,
+        "minConsecutiveDot": 0.9999788097778067,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.000030247840170720132,
-        "maxRotationError": 0.00019675522055470285
+        "maxPositionError": 0.00003526264559181748,
+        "maxRotationError": 0.00021537478083694353
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 83.21660500000007
+      "exportMs": 208.37611400000014
     },
     {
       "kind": "recipe",
@@ -290,32 +290,32 @@
       "status": "pass",
       "frames": 661,
       "duration": 11,
-      "glbBytes": 346160,
-      "manifestBytes": 10868,
-      "sha256": "562f13a666fffc9172bf2260ccd19f0e2e40dc5d3f61d59688e040214316e3b0",
-      "maxPositionError": 3.9792664740210337e-8,
-      "maxRootError": 9.406549650314844e-9,
-      "maxRotationError": 1.1751546175053924e-7,
-      "maxWorldRotationError": 1.1407382478433052e-7,
+      "glbBytes": 346168,
+      "manifestBytes": 10723,
+      "sha256": "806e303098df333557877ecdb34f89513cee5aed20b06990f147ef6e99a9927e",
+      "maxPositionError": 4.483718165752064e-8,
+      "maxRootError": 9.228683064271825e-9,
+      "maxRotationError": 1.176617078035952e-7,
+      "maxWorldRotationError": 1.1269850000277552e-7,
       "maxBoneLengthRelError": 5.507376036698968e-10,
-      "importedMinConsecutiveDot": 0.9999948015226157,
+      "importedMinConsecutiveDot": 0.9999947012912149,
       "withinTolerance": true,
       "issues": [],
       "continuity": {
-        "maxStepDeg": 0.3694925757108605,
+        "maxStepDeg": 0.373038272454475,
         "maxStepAllowedDeg": 10,
-        "minConsecutiveDot": 0.9999948015268544,
+        "minConsecutiveDot": 0.9999947012778481,
         "flipsApplied": 0
       },
       "midFrame": {
         "available": true,
         "source": "engine samplePose",
-        "maxPositionError": 0.000007681840956185891,
-        "maxRotationError": 0.000049908358469047615
+        "maxPositionError": 0.000008954265809373025,
+        "maxRotationError": 0.000054665988580095185
       },
       "manifestValidationWithinTolerance": true,
       "metricsAvailable": true,
-      "exportMs": 144.95126299999993,
+      "exportMs": 241.6652610000001,
       "sampleFiles": {
         "glb": "evidence/exports/bilateral-heel-raise.v1.glb",
         "manifest": "evidence/exports/bilateral-heel-raise.v1.manifest.json"
@@ -354,7 +354,7 @@
       },
       "manifestValidationWithinTolerance": false,
       "metricsAvailable": false,
-      "exportMs": 14.159128999999893
+      "exportMs": 16.161970999999994
     },
     {
       "kind": "control",
@@ -389,7 +389,7 @@
       },
       "manifestValidationWithinTolerance": false,
       "metricsAvailable": false,
-      "exportMs": 22.033100999999988
+      "exportMs": 25.28428299999996
     },
     {
       "kind": "control",
@@ -424,7 +424,7 @@
       },
       "manifestValidationWithinTolerance": false,
       "metricsAvailable": false,
-      "exportMs": 10.664142999999967
+      "exportMs": 10.752909000000272
     }
   ]
 }

@@ -15,7 +15,7 @@ import { TOLERANCES } from '../tolerances.ts';
 import { footGeom, footTargetAt, siteUnderTarget, type FootGeom } from './footPose.ts';
 import { legIndices, solveLegChain, type LegJointsIdx } from './legChain.ts';
 import { kneeForwardDot } from './legIk.ts';
-import { stabilizePelvis } from './stabilize.ts';
+import { stabilizePelvisWithBase, type BaseSolutions } from './stabilize.ts';
 import type { ContactEvaluation, FootTarget, LegReport, LimitEvent, PoseSample, SolverTier, StabilizationReport } from './types.ts';
 
 interface ContactMeta {
@@ -170,16 +170,21 @@ function sampleSolved(plan: MotionPlan, rig: RigDefinition, t: number, tier: 'an
 
   // 4. Optional bounded stabilisation (tier 2). Never modifies authored channels.
   let stab = DISABLED_STAB;
+  let baseSolutions: BaseSolutions = {};
   if (tier === 'stabilized' && plan.stabilization.enabled) {
-    stab = stabilizePelvis({ model, legs: c.legs, base, pelvisRot, targets, seatWeight: ws, spec: plan.stabilization, swingWeight: swingReachWeights(plan, t) });
+    const r = stabilizePelvisWithBase({ model, legs: c.legs, base, pelvisRot, targets, seatWeight: ws, spec: plan.stabilization, swingWeight: swingReachWeights(plan, t) });
+    stab = r.report;
+    baseSolutions = r.base;
   }
   const P = add(base, stab.offset);
+  const unchanged = stab.offset[0] === 0 && stab.offset[1] === 0 && stab.offset[2] === 0;
 
   // 5. Legs: closed-form IK, then clamp every DOF to its limit.
   const legReports: LegReport[] = [];
   for (const side of SIDES) {
     const idx = c.legs[side];
-    const sol = solveLegChain(model, idx, P, pelvisRot, targets[side]);
+    // When the stabiliser left Δ = 0 the pose equals its base pose exactly: reuse that solve.
+    const sol = (unchanged ? baseSolutions[side] : undefined) ?? solveLegChain(model, idx, P, pelvisRot, targets[side]);
     const hip = clampJoint(model.joints[idx.hip]!, sol.angles.hip, events, sol.residual.hip);
     const knee = clampJoint(model.joints[idx.knee]!, [sol.ik.kneeFlexion], events);
     const ankleReq = targets[side].mode === 'swing' ? swingSoftLimit(plan, side, t, model.joints[idx.ankle]!, sol.angles.ankle, events) : sol.angles.ankle;

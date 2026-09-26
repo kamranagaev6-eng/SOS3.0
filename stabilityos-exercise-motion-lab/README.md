@@ -45,7 +45,7 @@ npm run build             # typecheck + production build (dist/)
 | `npm run report:roundtrip` | glTF export → reimport → pose comparison, all recipes | `evidence/ROUNDTRIP.md`, `evidence/exports/*` |
 | `npm run bench:solver` | solver cost distributions (Node) | `evidence/SOLVER_BENCH.md` |
 | `npm run test:e2e` | Playwright workbench tests (builds + serves `dist/`) | `evidence/e2e-results.json`, `evidence/screenshots/` |
-| `npm run bench:render` | in-browser render vs sampling cost (Playwright) | `evidence/render-bench.json` |
+| `npm run bench:render` | in-browser render vs sampling cost (Playwright); then `node scripts/render-bench-md.ts` | `evidence/render-bench.json`, `evidence/RENDER_BENCH.md` |
 | `node scripts/recipes-doc.ts` | regenerates `docs/RECIPES.md` from the registry | `docs/RECIPES.md` |
 
 Playwright uses the Chromium at `PLAYWRIGHT_BROWSERS_PATH` (1.56.1 ↔ Chromium 141); do not run

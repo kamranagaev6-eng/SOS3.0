@@ -3,7 +3,7 @@ import type { StabilizationSpec } from '../contracts/plan.ts';
 import type { Quat } from '../math/quat.ts';
 import { add, type Vec3 } from '../math/vec3.ts';
 import type { RigModel } from '../rig/model.ts';
-import { ANGULAR_LEVER, solveLegChain, type LegJointsIdx } from './legChain.ts';
+import { ANGULAR_LEVER, solveLegChain, type LegChainSolution, type LegJointsIdx } from './legChain.ts';
 import { reachForKneeFlexion } from './legIk.ts';
 import type { FootTarget, StabilizationReport } from './types.ts';
 
@@ -51,7 +51,19 @@ interface ReachTarget {
  * Swing legs: the floor is relaxed by (1 − w) where w fades 1 → 0 over the first and last 20 % of
  * the swing, so a leg's constraint neither appears nor vanishes abruptly at lift-off or landing.
  */
-function reachTargets(inp: StabilizeInput): Record<'left' | 'right', ReachTarget | null> {
+/** Leg solutions at Δ = 0 for every leg the stabiliser constrains (computed once per sample, reused). */
+export type BaseSolutions = Partial<Record<'left' | 'right', LegChainSolution>>;
+
+function baseSolutions(inp: StabilizeInput): BaseSolutions {
+  const out: BaseSolutions = {};
+  for (const side of ['left', 'right'] as const) {
+    const w = inp.swingWeight?.[side] ?? (inp.targets[side].mode === 'swing' ? 0 : 1);
+    if (w > 0) out[side] = solveLegChain(inp.model, inp.legs[side], inp.base, inp.pelvisRot, inp.targets[side]);
+  }
+  return out;
+}
+
+function reachTargets(inp: StabilizeInput, base: BaseSolutions = baseSolutions(inp)): Record<'left' | 'right', ReachTarget | null> {
   const out: Record<'left' | 'right', ReachTarget | null> = { left: null, right: null };
   const qFloor = 1 - Math.cos(inp.spec.kneeFlexionFloor);
   const qZone = 1 - Math.cos(inp.spec.kneeFlexionFloor + inp.spec.reachSoftZone) - qFloor;
@@ -59,7 +71,7 @@ function reachTargets(inp: StabilizeInput): Record<'left' | 'right', ReachTarget
     const w = inp.swingWeight?.[side] ?? (inp.targets[side].mode === 'swing' ? 0 : 1);
     if (w <= 0) continue;
     const idx = inp.legs[side];
-    const sol = solveLegChain(inp.model, idx, inp.base, inp.pelvisRot, inp.targets[side]);
+    const sol = base[side] ?? solveLegChain(inp.model, idx, inp.base, inp.pelvisRot, inp.targets[side]);
     const l1 = -inp.model.offset[idx.knee]![1];
     const l2 = -inp.model.offset[idx.ankle]![1];
     const floor = qFloor - (1 - w) * 2;
@@ -68,14 +80,16 @@ function reachTargets(inp: StabilizeInput): Record<'left' | 'right', ReachTarget
   return out;
 }
 
-export function constraintValues(inp: StabilizeInput, delta: Vec3, reach = reachTargets(inp)): number[] {
+export function constraintValues(inp: StabilizeInput, delta: Vec3, reach = reachTargets(inp), atBase?: BaseSolutions): number[] {
   const P = add(inp.base, delta);
+  // At Δ = 0 the pose equals the base pose bit-for-bit, so precomputed base solutions are reused.
+  const reuse = atBase !== undefined && delta[0] === 0 && delta[1] === 0 && delta[2] === 0;
   const out: number[] = [];
   for (const side of ['left', 'right'] as const) {
     const rt = reach[side];
     if (!rt) continue;
     const idx = inp.legs[side];
-    const sol = solveLegChain(inp.model, idx, P, inp.pelvisRot, inp.targets[side]);
+    const sol = (reuse ? atBase[side] : undefined) ?? solveLegChain(inp.model, idx, P, inp.pelvisRot, inp.targets[side]);
     const kneeDof = inp.model.joints[idx.knee]!.dofs[0]!;
     // Soft reach, in metres-equivalent (dd/dq ≈ L1 L2 / R): driven to equality, never clipped.
     out.push((rt.q - openness(sol.ik.distance, rt.l1, rt.l2)) * ((rt.l1 * rt.l2) / (rt.l1 + rt.l2)));
@@ -148,14 +162,24 @@ const isReach = (i: number, perLeg: number): boolean => i % perLeg === 0;
  * reduce total violation. Returns the best iterate and whether all constraints are satisfied.
  */
 export function stabilizePelvis(inp: StabilizeInput): StabilizationReport {
+  return stabilizePelvisWithBase(inp).report;
+}
+
+/** As stabilizePelvis, also returning the Δ = 0 leg solutions so callers can reuse them when Δ stays 0. */
+export function stabilizePelvisWithBase(inp: StabilizeInput): { report: StabilizationReport; base: BaseSolutions } {
+  const base = baseSolutions(inp);
+  return { report: stabilizeCore(inp, base), base };
+}
+
+function stabilizeCore(inp: StabilizeInput, base: BaseSolutions): StabilizationReport {
   const b: Vec3 = [
     inp.spec.bounds[0] * (1 - inp.seatWeight),
     inp.spec.bounds[1] * (1 - inp.seatWeight),
     inp.spec.bounds[2] * (1 - inp.seatWeight),
   ];
   let delta: Vec3 = [0, 0, 0];
-  const reach = reachTargets(inp);
-  const cv = (d: Vec3) => constraintValues(inp, d, reach);
+  const reach = reachTargets(inp, base);
+  const cv = (d: Vec3) => constraintValues(inp, d, reach, base);
   let g = cv(delta);
   const legsConstrained = (['left', 'right'] as const).filter((s) => reach[s] !== null).length;
   const perLeg = legsConstrained > 0 ? g.length / legsConstrained : 1;

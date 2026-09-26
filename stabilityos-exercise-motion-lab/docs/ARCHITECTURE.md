@@ -82,8 +82,8 @@ recipeId + params ──compileRecipe(rig)──► MotionPlan ──samplePose(
 | Tier | What | Evidence |
 |---|---|---|
 | baseline | solved joint angles replayed with the pelvis frozen at its t = 0 transform — the host's current behaviour | planted-foot displacement 46–646 mm, penetration up to 469 mm (`evidence/METRICS.md`) |
-| 1 analytic | authored pelvis + closed-form IK + closed-form foot poses | within tolerance in 304 / 395 compiled sweep configs; all failures in the step-up |
-| 2 stabilised | tier 1 + bounded pelvis-translation correction | within tolerance in 386 / 395; every remaining failure flagged infeasible at compile time |
+| 1 analytic | authored pelvis + closed-form IK + closed-form foot poses | within tolerance in 350 / 469 compiled sweep configs; all failures in the step-up (14 / 133 pass) |
+| 2 stabilised | tier 1 + bounded pelvis-translation correction | within tolerance in 469 / 469 (step-up 133 / 133); median max correction 1.2 mm |
 
 The stabiliser adds complexity only where it is measured to help (the step-up transfer phases, where
 the trailing leg runs out of reach). Design:
@@ -149,10 +149,24 @@ worst joint-position error 5.2e-7 m vs 5e-5 m tolerance (`evidence/ROUNDTRIP.md`
 
 ## 10. Rendering and workbench
 
-See `src/render/` (Three.js behind a small stage interface; React never imports three) and
-`src/app/`. The player computes `t = anchorTime + (now − anchorWall) · speed` and samples the engine
-once per frame (twice in comparison mode). Details and measured costs: `docs/VALIDATION.md`,
-`evidence/RENDER_BENCH.md`.
+* **Render adapter** (`src/render/`): `createStage(canvas, opts) → Stage` hides Three.js entirely
+  (React never imports three). Methods: `setRig`, `setEnvironment`, `setPose(primary, comparison?)`,
+  `setTrajectory`, `setHostBones`, `resetOverlays` (on every new plan, so no stale constraints survive),
+  `setOverlays`, `setInspectionSide`, `setView`, `setFraming`, `setComparison` (scissor split: baseline
+  vs selected tier over the same environment), `setReducedMotion`, `resize`, `render`, `getStats`,
+  `dispose`. A `ResourceLedger` tracks every geometry/material the stage creates; tests assert it returns
+  to zero. WebGL-2 unavailability throws `StageUnavailableError`, shown as a readable state while the
+  numerical panels keep working.
+* **Humanoid**: rigid segment meshes on per-joint `Object3D`s placed from `sample.worldPos/worldRot`
+  (no skinning); left limbs teal, right amber, separate toe segments, a visor showing facing.
+* **Player** (`src/player/`): `t = anchorTime + (now − anchorWall) · speed`, re-anchored on
+  play/pause/seek/speed; never accumulates frame deltas. Samples once per frame (twice in comparison).
+* **Workbench** (`src/app/`): recipe selection by explicit id, rig A / B / C, phase timeline with
+  per-foot contact lanes and cue markers, scrubber, speed, views, left/right inspection, parameter
+  editor generated from `paramSpecs`, overlays, tier selector, live per-contact residuals, whole-clip
+  metrics from `analyzePlan` in a Web Worker, recipe/metadata panel, import/export and round-trip
+  verification, keyboard shortcuts, reduced-motion static inspection, responsive layout.
+  Measured costs: `evidence/RENDER_BENCH.md`; test coverage: `docs/VALIDATION.md` §4.
 
 ## 11. Known limitations
 

@@ -10,7 +10,9 @@ committed tree.
 | 3 | Solver tiers (analytic IK, bounded stabiliser, baseline), plan validation, four recipes | `77259f7` |
 | 4 | Soft-reach stabiliser (C1), independent metrics, glTF export path, core tests | `aad76f0` |
 | 5 | Rig adapter (rigs B/C), two-rate continuity analysis, sweep + solver-bench scripts | `183c66d` |
-| 6 | Workbench + render adapter, validation suite, benchmarks, docs, evidence | see `git log` |
+| 6 | Validation suite (862 tests) and fixes for the 10 defects it found; rig adapter; export path | `fc40499` |
+| 7 | Workbench + render adapter + Playwright (19 tests) + render bench | `b754bbe` |
+| 8 | Final sweep (488 configs, 0 silent failures), solver optimisation (bitwise-identical, −32–36 % sample cost), benchmarks, validation write-up | see `git log` |
 
 ## Work organisation
 
@@ -34,6 +36,11 @@ workbench + render adapter + Playwright tests, and the recipe validation suite.
   full extension failed to converge on the big-feet rig).
 * Continuity metric refined at h/4 around candidates: distinguishes true C1 breaks from smooth
   acceleration at faster tempos.
+* Compile-time feasibility now runs at the 240 Hz metric rate through the independent analyser (a
+  30 Hz scan missed a 3 ms toe penetration): "feasible" implies "within tolerance" by construction, at
+  the cost of ~0.1–0.2 s compile time.
+* The stabilised tier reuses its Δ = 0 leg solutions (was solving each leg up to 3× per sample):
+  output verified bitwise-identical; sample cost −32–36 %, compile −16–26 %.
 
 ## Budget
 
