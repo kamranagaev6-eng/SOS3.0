@@ -78,6 +78,14 @@ const pose = samplePose(c.plan, res.adapter.canonical, t);
 applyToHostSkeleton(res.adapter.toHostPose(pose));        // local transforms in host units/axes
 ```
 
+A runnable, tested version of exactly this path is `examples/host-integration.ts`
+(`npm run example:host`, also run in CI and by `tests/integration/host-integration-example.test.ts`).
+It drives synthetic rig B (cm, Z-up, T-pose arms, an extra unmapped spine bone) and checks the result
+**through the host skeleton's own FK**: planted sites move 0.0000 mm, host-located sites match the
+engine to ~1e-15 m, no host bone is stretched (only the declared root-motion bone translates), nothing
+the motion needs is dropped — and the legacy rig C is refused with three `MISSING_CAPABILITY` errors
+whose hints name the bones to add.
+
 Offline alternative: `bakeClip` → `exportBakedClipToGlb` → ship `.glb` **plus** its manifest (the
 manifest is what preserves exercise meaning, provenance and review status).
 

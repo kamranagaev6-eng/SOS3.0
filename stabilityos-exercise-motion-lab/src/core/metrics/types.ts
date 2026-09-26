@@ -36,9 +36,11 @@ export interface ClipMetrics {
   /** Max velocity jump for pelvis and contact sites (m/s). */
   maxLinearVelocityJump: number;
   /**
-   * Raw values at `sampleRate` before refinement. A true C1 break gives a rate-independent value;
-   * smooth acceleration gives |θ''|·h. Where the raw value exceeds tolerance, analyzePlan re-samples
-   * the neighbourhood at h/4: the reported max*VelocityJump uses the refined value there.
+   * Raw second differences at `sampleRate` before refinement. A true C1 break of size ΔV shows
+   * ≥ ΔV/2 (it may split across two stencils); smooth acceleration shows |θ''|·h. analyzePlan
+   * refines every raw value above ¼ of the tolerance at h/8 using the velocity change across
+   * adjacent stencils, and counts unrefined values twice, so the reported max*VelocityJump is a
+   * conservative bound on true velocity breaks that is not inflated by smooth acceleration.
    */
   rawJointVelocityJump: number;
   rawLinearVelocityJump: number;

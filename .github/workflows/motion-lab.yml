@@ -1,0 +1,74 @@
+# CI for stabilityos-exercise-motion-lab (synthetic, unreviewed engineering prototype).
+# Geometric/kinematic verification only — passing CI is not clinical validation.
+name: motion-lab
+
+on:
+  pull_request:
+    paths:
+      - 'stabilityos-exercise-motion-lab/**'
+      - '.github/workflows/motion-lab.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'stabilityos-exercise-motion-lab/**'
+      - '.github/workflows/motion-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motion-lab-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: stabilityos-exercise-motion-lab
+
+jobs:
+  verify:
+    name: typecheck, tests, build, export round trip
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: stabilityos-exercise-motion-lab/.nvmrc
+          cache: npm
+          cache-dependency-path: stabilityos-exercise-motion-lab/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      # Unit, seeded property, integration and validation suites (tolerances in src/core/tolerances.ts).
+      - run: npm test
+      - run: npm run build
+      # glTF export → reimport → pose comparison for every recipe (exits non-zero on any failure).
+      - run: npm run report:roundtrip
+      # Documented host-integration path (adapter → compile → sample → host pose), verified via host FK.
+      - run: npm run example:host
+
+  e2e:
+    name: workbench (Playwright, Chromium + SwiftShader)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: stabilityos-exercise-motion-lab/.nvmrc
+          cache: npm
+          cache-dependency-path: stabilityos-exercise-motion-lab/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # The Playwright config builds the app and serves `vite preview` on :4173.
+      - run: npx playwright test --project=workbench
+      - name: Upload Playwright output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-output
+          path: |
+            stabilityos-exercise-motion-lab/evidence/playwright-output
+            stabilityos-exercise-motion-lab/evidence/e2e-results.json
+            stabilityos-exercise-motion-lab/evidence/screenshots
+          retention-days: 7

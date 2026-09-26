@@ -137,7 +137,7 @@ export class ClipAnalyzer {
       const { joint, linear } = secondDifferenceJumps(a, b, c, this.h);
       m.rawJointVelocityJump = Math.max(m.rawJointVelocityJump, joint);
       m.rawLinearVelocityJump = Math.max(m.rawLinearVelocityJump, linear);
-      if (joint > TOLERANCES.jointVelocityJump || linear > TOLERANCES.linearVelocityJump) this.candidates.push(b.t);
+      if (joint > TOLERANCES.jointVelocityJump * CANDIDATE_FRACTION || linear > TOLERANCES.linearVelocityJump * CANDIDATE_FRACTION) this.candidates.push(b.t);
       else {
         this.smoothJoint = Math.max(this.smoothJoint, joint);
         this.smoothLinear = Math.max(this.smoothLinear, linear);
@@ -150,23 +150,36 @@ export class ClipAnalyzer {
   private smoothLinear = 0;
 
   /**
-   * Two-rate discontinuity test: re-sample [t − h, t + h] at h/4 around each candidate. A C1
-   * break keeps its size; smooth acceleration shrinks 4×. Without a sampler, raw values stand.
+   * Discontinuity refinement. A velocity break ΔV between two raw samples splits across (at most)
+   * two raw stencils, so each shows ≥ ΔV/2; smooth acceleration shows |θ''|·h. Therefore:
+   *  - every raw value above CANDIDATE_FRACTION × tolerance is re-sampled over [t − h, t + h] at
+   *    q = h/8, and the velocity change across adjacent stencils, |(θ₃ − θ₂) − (θ₁ − θ₀)|/q, is
+   *    measured — this captures a split break in full, while acceleration contributes only 2q|θ''|;
+   *  - values that were not refined are counted twice (the most a split break could hide).
+   * Hence a break ≥ tolerance can never be reported as passing, and smooth acceleration of
+   * ~150 rad/s² reads as ≈ 0.16 rad/s instead of ≈ 0.6 rad/s. Without a sampler, raw values stand.
    */
   refine(sampleAt: (t: number) => PoseSample): void {
     const m = this.m;
-    let joint = this.smoothJoint;
-    let linear = this.smoothLinear;
-    let last = -Infinity;
-    const q = this.h / 4;
+    let joint = 2 * this.smoothJoint;
+    let linear = 2 * this.smoothLinear;
+    // Merge overlapping candidate windows [t − h, t + h] (candidates arrive in time order).
+    const windows: [number, number][] = [];
     for (const t of this.candidates) {
-      if (t - last < this.h) continue;
-      last = t;
+      const a = Math.max(0, t - this.h);
+      const b = Math.min(this.plan.duration, t + this.h);
+      const last = windows.at(-1);
+      if (last && a <= last[1]) last[1] = Math.max(last[1], b);
+      else windows.push([a, b]);
+    }
+    for (const [a, b] of windows) {
       m.refinedCandidates++;
+      const n = Math.max(3, Math.round(((b - a) / this.h) * REFINE_SUBDIVISION));
+      const q = (b - a) / n;
       const ss: PoseSample[] = [];
-      for (let k = -4; k <= 4; k++) ss.push(sampleAt(Math.min(this.plan.duration, Math.max(0, t + k * q))));
-      for (let k = 1; k + 1 < ss.length; k++) {
-        const r = secondDifferenceJumps(ss[k - 1]!, ss[k]!, ss[k + 1]!, q);
+      for (let k = 0; k <= n; k++) ss.push(sampleAt(a + (b - a) * (k / n)));
+      for (let k = 0; k + 3 < ss.length; k++) {
+        const r = velocityChangeAcross(ss[k]!, ss[k + 1]!, ss[k + 2]!, ss[k + 3]!, q);
         joint = Math.max(joint, r.joint);
         linear = Math.max(linear, r.linear);
       }
@@ -206,6 +219,24 @@ export class ClipAnalyzer {
     m.withinTolerance = f.length === 0;
     return m;
   }
+}
+
+/** Raw values above this fraction of the tolerance are refined (see ClipAnalyzer.refine). */
+const CANDIDATE_FRACTION = 0.25;
+/** Refinement step is h / REFINE_SUBDIVISION. */
+const REFINE_SUBDIVISION = 8;
+
+/** Velocity change across two adjacent stencils: |(d − c) − (b − a)| / q per DOF and per point. */
+function velocityChangeAcross(a: PoseSample, b: PoseSample, c: PoseSample, d: PoseSample, q: number): { joint: number; linear: number } {
+  let joint = 0;
+  for (let j = 0; j < a.angles.length; j++)
+    for (let k = 0; k < a.angles[j]!.length; k++)
+      joint = Math.max(joint, Math.abs(d.angles[j]![k]! - c.angles[j]![k]! - b.angles[j]![k]! + a.angles[j]![k]!) / q);
+  const lin = (pa: Vec3, pb: Vec3, pc: Vec3, pd: Vec3) =>
+    Math.hypot(pd[0] - pc[0] - pb[0] + pa[0], pd[1] - pc[1] - pb[1] + pa[1], pd[2] - pc[2] - pb[2] + pa[2]) / q;
+  let linear = lin(a.pelvisWorld, b.pelvisWorld, c.pelvisWorld, d.pelvisWorld);
+  for (let i = 0; i < a.sitePos.length; i++) linear = Math.max(linear, lin(a.sitePos[i]!, b.sitePos[i]!, c.sitePos[i]!, d.sitePos[i]!));
+  return { joint, linear };
 }
 
 function secondDifferenceJumps(a: PoseSample, b: PoseSample, c: PoseSample, h: number): { joint: number; linear: number } {

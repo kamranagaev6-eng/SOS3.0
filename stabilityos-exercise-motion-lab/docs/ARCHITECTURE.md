@@ -123,8 +123,13 @@ is in `evidence/SOLVER_BENCH.md`.
 `ClipAnalyzer` recomputes, from FK output and environment geometry only: planted-site displacement
 since contact onset, contact height vs support surface, sole tilt vs world up, penetration of every
 sole/seat site, bone and site rigidity, joint limits by re-decomposing local rotations, knee flips,
-and continuity by second differences with a **two-rate refinement** (a C1 break keeps its size at
-h/4, smooth acceleration shrinks 4×). `analyzePlan` streams at 240 Hz (bounded memory).
+and continuity. Continuity uses second differences at 240 Hz, then **refines** every raw value above
+¼ of the tolerance at h/8 by measuring the velocity change across adjacent stencils, and counts
+unrefined values twice. A velocity break ΔV splits across at most two raw stencils (each ≥ ΔV/2), so
+a break at or above tolerance can never be reported as passing, while smooth acceleration a
+contributes only ≈ 2a·h/8 instead of a·h (tested by injecting breaks at six sub-sample alignments and
+pure acceleration: `tests/validation/continuity-estimator.test.ts`; the previous estimator failed 14
+of those 20 cases). `analyzePlan` streams at 240 Hz (bounded memory).
 
 ## 8. Rig adapter (`core/adapter`)
 

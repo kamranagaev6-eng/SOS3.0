@@ -186,7 +186,11 @@ function stabilizeCore(inp: StabilizeInput, base: BaseSolutions): StabilizationR
   const margin = (i: number) => (isReach(i, perLeg) ? 0 : MARGIN);
   const initialViolation = sumViolation(g);
   const tol = inp.spec.tolerance;
-  if (maxViolation(g) <= tol) {
+  // Activate and terminate at the SAME threshold: activating only above `tol` but solving down to
+  // tol·1e-3 made the correction jump from 0 to its solved value at activation (a ~1e-6 m-equivalent
+  // step, i.e. ~1e-4 rad of knee angle near full extension, where κ is hypersensitive to reach).
+  const solveTarget = tol * 1e-3;
+  if (maxViolation(g) <= solveTarget) {
     return { enabled: true, offset: delta, iterations: 0, converged: true, boundReached: false, initialViolation, finalViolation: initialViolation };
   }
   let iterations = 0;
@@ -199,7 +203,7 @@ function stabilizeCore(inp: StabilizeInput, base: BaseSolutions): StabilizationR
   ];
   // Iterate well past the acceptance tolerance so the converged offset is a smooth function of t.
   for (; iterations < inp.spec.maxIterations; iterations++) {
-    if (maxViolation(g) <= tol * 1e-3) break;
+    if (maxViolation(g) <= solveTarget) break;
     const active: number[] = [];
     g.forEach((v, i) => {
       if (v + margin(i) > 1e-15) active.push(i);

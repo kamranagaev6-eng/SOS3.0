@@ -22,7 +22,8 @@
     "report:roundtrip": "node scripts/roundtrip-report.ts",
     "report:env": "node scripts/env-report.ts",
     "verify": "npm run typecheck && npm run test && npm run report:metrics && npm run report:roundtrip",
-    "docs:recipes": "node scripts/recipes-doc.ts"
+    "docs:recipes": "node scripts/recipes-doc.ts",
+    "example:host": "node examples/host-integration.ts"
   },
   "dependencies": {
     "react": "19.3.0",

@@ -46,6 +46,7 @@ npm run build             # typecheck + production build (dist/)
 | `npm run bench:solver` | solver cost distributions (Node) | `evidence/SOLVER_BENCH.md` |
 | `npm run test:e2e` | Playwright workbench tests (builds + serves `dist/`) | `evidence/e2e-results.json`, `evidence/screenshots/` |
 | `npm run bench:render` | in-browser render vs sampling cost (Playwright); then `node scripts/render-bench-md.ts` | `evidence/render-bench.json`, `evidence/RENDER_BENCH.md` |
+| `npm run example:host` | host-integration walkthrough on an adapted host skeleton, verified through host FK | console (exits non-zero on failure) |
 | `node scripts/recipes-doc.ts` | regenerates `docs/RECIPES.md` from the registry | `docs/RECIPES.md` |
 
 Playwright uses the Chromium at `PLAYWRIGHT_BROWSERS_PATH` (1.56.1 ↔ Chromium 141); do not run
