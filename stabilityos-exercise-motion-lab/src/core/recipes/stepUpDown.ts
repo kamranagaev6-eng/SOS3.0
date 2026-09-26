@@ -164,7 +164,7 @@ function build(v: Values, rig: RigDefinition) {
     }
   }
   const P_accept = solve('weight-accept', pair(D, flatF(D), flatS(S)), 0.2 * x(S), (stepAnchor(S).z + floorAnchor(D).z) / 2, yInit, deg(4), D, deg(15));
-  const P_transfer = solve('transfer-back', pair(D, flatF(D), flatS(S)), 0.5 * x(D), floorAnchor(D).z + 0.05, yInit, 0, D, STANDING_KNEE);
+  const P_transfer = solve('transfer-back', pair(D, flatF(D), flatS(S)), 0.5 * x(D), floorAnchor(D).z + 0.05, yInit, 0, 'min', STANDING_KNEE);
   const P_end = solve('stand-floor-end', floorBoth, 0, zFloor + 0.02, yInit, 0, 'min', STANDING_KNEE);
   if (diagnostics.length) return { plan: null, diagnostics };
 
