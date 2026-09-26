@@ -552,12 +552,16 @@ export function App() {
   );
 }
 
+const SEVERITY_ORDER: Record<Diagnostic['severity'], number> = { error: 0, warning: 1, info: 2 };
+
 function BlockerMessage(props: { title: string; lead?: string; diagnostics: readonly Diagnostic[]; testId: string }) {
+  // Errors first: they are why nothing is shown; notes follow.
+  const sorted = [...props.diagnostics].sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
   return (
     <div className="blocker" role="alert" data-testid={props.testId}>
       <h3>{props.title}</h3>
       {props.lead ? <p>{props.lead}</p> : null}
-      <DiagnosticList diagnostics={props.diagnostics} />
+      <DiagnosticList diagnostics={sorted} />
     </div>
   );
 }

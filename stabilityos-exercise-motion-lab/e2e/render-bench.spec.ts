@@ -7,8 +7,10 @@ import type { RenderBenchRun } from '../src/app/testHooks.ts';
  * In-browser benchmark of the workbench's per-frame work, measured SEPARATELY:
  *   (a) engine sampling (samplePose ×1, or ×2 in comparison mode),
  *   (b) stage update (pose → Object3D transforms and overlays),
- *   (c) render: CPU time inside renderer.render (all viewports), and render + gl.finish().
- * ≥600 frames per recipe and mode, after a 10-frame warm-up. Results go to evidence/render-bench.json.
+ *   (c) render: CPU time inside renderer.render (all viewports), and render + gl.finish(),
+ *   (d) the requestAnimationFrame interval (frame pacing incl. compositing).
+ * Frames are paced by requestAnimationFrame like the real workbench; ≥600 measured frames per recipe
+ * and mode after a 10-frame warm-up. Results go to evidence/render-bench.json.
  * In this container WebGL runs on SwiftShader (CPU rasteriser): render numbers are software-rendered
  * and NOT representative of client GPUs.
  */
@@ -65,7 +67,9 @@ test('render benchmark: engine sampling vs rendering, normal and comparison mode
           renderCpu: dist(run.renderCpuMs),
           renderPlusGlFinish: dist(run.renderFinishMs),
           wholeFrame: dist(run.frameMs),
+          rafInterval: dist(run.rafIntervalMs),
         },
+        timerResolutionMs: run.timerResolutionMs,
       });
     }
   }
@@ -75,7 +79,7 @@ test('render benchmark: engine sampling vs rendering, normal and comparison mode
     generatedAt: new Date().toISOString(),
     kind: 'workbench render benchmark (in-browser, Playwright)',
     statement:
-      'Engine sampling and rendering are measured separately per frame. Render timings include renderer.render CPU time and, separately, render + gl.finish(). ' +
+      'Engine sampling and rendering are measured separately per rAF-paced frame. Render timings include renderer.render CPU time and, separately, render + gl.finish(). ' +
       (software
         ? 'WebGL ran on a SOFTWARE rasteriser (SwiftShader) in a headless container: render numbers are software-rendered and NOT representative of client GPUs.'
         : 'WebGL renderer as reported below.'),
@@ -97,7 +101,8 @@ test('render benchmark: engine sampling vs rendering, normal and comparison mode
       timeStep: '1/60 s, wrapping at the clip duration',
       solverTier: 'stabilized (plus baseline in comparison mode)',
       overlays: 'workbench defaults (contact targets, sites, residuals, trajectory, failures)',
-      clock: 'performance.now() (browser-clamped resolution)',
+      pacing: 'requestAnimationFrame (one measured frame per callback)',
+      clock: 'performance.now(); Chromium clamps it (see timerResolutionMs per run), so sub-resolution values read as 0',
     },
     results,
   };

@@ -180,3 +180,17 @@ describe('2 kHz scan around every transition: no per-step jumps (second differen
     });
   }
 });
+
+describe('the detectors have teeth', () => {
+  it('a heel-lift curve that is still 60 mm up when the flat state begins shows up as a C0 jump (and validatePlan rejects the plan)', () => {
+    const base = cases.find((c) => c.name.startsWith('bilateral-heel-raise.v1') && c.rig === rigA)!;
+    const p = structuredClone(base.plan);
+    p.feet.left = p.feet.left.map((s) => structuredClone(s));
+    const ff = p.feet.left[1]!;
+    if (ff.kind !== 'forefoot') throw new Error('setup');
+    const k = ff.heelLift.keys;
+    ff.heelLift = { keys: [k[0]!, k[1]!, { t: ff.end, v: 0.06, mode: 'stop' }, { t: ff.end + 0.5, v: 0, mode: 'stop' }] };
+    const j = c0Jump(samplePose(p, rigA, ff.end - EPS), samplePose(p, rigA, ff.end));
+    expect(j.pos).toBeGreaterThan(0.05);
+  });
+});

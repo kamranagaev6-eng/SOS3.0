@@ -83,7 +83,8 @@ export class ViewerController {
     if (this.stage) {
       if (rigChanged) this.stage.setRig(rig);
       if (envKey !== this.envKey || rigChanged) this.stage.setEnvironment(env);
-      this.stage.setTrajectory(null, null);
+      // New plan: no overlay object (pooled markers, trajectories, host bones) survives from the old one.
+      this.stage.resetOverlays();
       this.stage.setFraming(framing);
       if (!plan) this.stage.setPose(null, null);
     }

@@ -326,6 +326,7 @@ kbd {
   }
   .area-right {
     display: flex;
+    align-items: stretch;
   }
   .app-header {
     padding: 8px 16px;

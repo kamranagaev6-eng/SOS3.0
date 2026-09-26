@@ -124,6 +124,8 @@ export interface Stage {
   /** Whole-clip pelvis trajectory polylines (primary tier, optional comparison tier). */
   setTrajectory(primary: readonly Vec3[] | null, comparison?: readonly Vec3[] | null): void;
   setHostBones(bones: readonly HostBoneView[] | null): void;
+  /** New plan: drops the current poses and every per-sample overlay object (pooled markers, trajectories, host bones). */
+  resetOverlays(): void;
   setOverlays(flags: Partial<OverlayFlags>): void;
   getOverlays(): OverlayFlags;
   /** Highlight one side's limbs and contacts (null = no highlight). */

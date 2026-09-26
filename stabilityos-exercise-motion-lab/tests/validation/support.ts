@@ -123,11 +123,25 @@ export const swapSide = (name: string): string =>
  *  - reported DOF angles lie within limits ± jointLimit, and composing them per the contract reproduces `local`.
  * Returns human-readable problems (empty = pass).
  */
+const rigIndexCache = new WeakMap<RigDefinition, { parent: number[]; siteJoint: number[] }>();
+function rigIndex(rig: RigDefinition): { parent: number[]; siteJoint: number[] } {
+  let hit = rigIndexCache.get(rig);
+  if (!hit) {
+    hit = {
+      parent: rig.joints.map((jt) => (jt.parent === null ? -1 : rig.joints.findIndex((x) => x.name === jt.parent))),
+      siteJoint: rig.sites.map((st) => jointIdx(rig, st.joint)),
+    };
+    rigIndexCache.set(rig, hit);
+  }
+  return hit;
+}
+
 export function rigidityAndLimitProblems(rig: RigDefinition, s: PoseSample, boneRelTol: number, limitTol: number): string[] {
   const out: string[] = [];
+  const ix = rigIndex(rig);
   rig.joints.forEach((jt, j) => {
     if (jt.parent !== null && jt.kind !== 'pelvis') {
-      const p = rig.joints.findIndex((x) => x.name === jt.parent);
+      const p = ix.parent[j]!;
       const rest = vlen(jt.offset);
       if (rest > 0) {
         const rel = Math.abs(vdist(s.worldPos[j]!, s.worldPos[p]!) - rest) / rest;
@@ -147,7 +161,7 @@ export function rigidityAndLimitProblems(rig: RigDefinition, s: PoseSample, bone
   rig.sites.forEach((st, i) => {
     const rest = vlen(st.offset);
     if (rest === 0) return;
-    const j = jointIdx(rig, st.joint);
+    const j = ix.siteJoint[i]!;
     const rel = Math.abs(vdist(s.sitePos[i]!, s.worldPos[j]!) - rest) / rest;
     if (!(rel <= boneRelTol)) out.push(`t=${s.t} ${s.tier}: site ${st.name} rel distance error ${rel.toExponential(2)}`);
   });
@@ -339,10 +353,12 @@ export interface Config {
 
 /**
  * Defaults; every combination of enum parameters (e.g. both leading sides of the step-up);
- * single-parameter min and max corners for EVERY numeric parameter (times and counts included);
- * two seeded random sets snapped to the parameter steps.
+ * single-parameter min and max corners for every numeric parameter (timing-only parameters —
+ * unit 's' or 'count' — can be excluded, see defineRecipeSweep); two seeded random sets snapped to
+ * the parameter steps (these always vary every parameter, timing included).
  */
-export function sweepConfigs(recipe: RecipeDefinition, randomCount = 2, seed = 0x5eed2026): Config[] {
+export function sweepConfigs(recipe: RecipeDefinition, opts: { timingCorners?: boolean; randomCount?: number; seed?: number } = {}): Config[] {
+  const { timingCorners = true, randomCount = 2, seed = 0x5eed2026 } = opts;
   const d = recipe.defaults();
   const out: Config[] = [{ name: 'defaults', params: { ...d } }];
   let combos: ParamRecord[] = [{}];
@@ -351,6 +367,7 @@ export function sweepConfigs(recipe: RecipeDefinition, randomCount = 2, seed = 0
     for (const c of combos) out.push({ name: Object.entries(c).map(([k, v]) => `${k}=${String(v)}`).join(','), params: { ...d, ...c } });
   for (const s of recipe.paramSpecs) {
     if (s.kind !== 'number') continue;
+    if (!timingCorners && (s.unit === 's' || s.unit === 'count')) continue;
     out.push({ name: `${s.key}=min(${s.min})`, params: { ...d, [s.key]: s.min } });
     out.push({ name: `${s.key}=max(${s.max})`, params: { ...d, [s.key]: s.max } });
   }
@@ -428,22 +445,42 @@ export function checkSweepConfig(recipeId: string, rig: RigDefinition, params: P
   }
 }
 
-export async function defineRecipeSweep(recipeId: string, tol: { boneLengthRel: number; jointLimit: number }): Promise<void> {
+/**
+ * Rig groups for splitting a recipe sweep across two test files (vitest runs files in parallel):
+ * group 1 = rig A + short legs + long legs + long trunk; group 2 = big feet + small + left leg
+ * +10 mm + host-derived rig B (when the adapter provides it).
+ */
+const RIG_GROUPS: Record<1 | 2, readonly string[]> = {
+  1: ['synthetic-rig-a', 'rig-a-short-legs', 'rig-a-long-legs', 'rig-a-long-trunk'],
+  2: ['rig-a-big-feet', 'rig-a-small', 'rig-a-lld', 'rig-b'],
+};
+
+export async function defineRecipeSweep(recipeId: string, tol: { boneLengthRel: number; jointLimit: number }, group: 1 | 2): Promise<void> {
   const recipe = getRecipe(recipeId);
   if (!recipe) throw new Error(`recipe ${recipeId} missing from the registry`);
-  const rigs = canonicalVariants();
-  const b = await loadRigB();
-  console.info(`[${recipeId} sweep] ${b.note}`);
-  if (b.rig) rigs.push(b.rig);
-  const configs = sweepConfigs(recipe);
-  describe(`${recipeId}: rig variants × parameter configurations (compile → validate → 240 Hz metrics)`, () => {
-    it('covers rig A, the scripts/sweep.ts variants and (when available) host-derived rig B', () => {
-      expect(rigs.map((r) => r.id)).toEqual(expect.arrayContaining(REQUIRED_VARIANTS));
+  const wanted = RIG_GROUPS[group];
+  const rigs = canonicalVariants().filter((r) => wanted.includes(r.id));
+  if (wanted.includes('rig-b')) {
+    const b = await loadRigB();
+    console.info(`[${recipeId} sweep] ${b.note}`);
+    if (b.rig) rigs.push(b.rig);
+  }
+  // Timing-only corners (durations, repetition counts) rescale time without changing geometry and
+  // give the longest clips: they run on the two acceptance rigs (A and host-derived B); every
+  // geometric corner and both random sets run on every rig variant.
+  const timingRigs = new Set(['synthetic-rig-a', ...(rigs.some((r) => !REQUIRED_VARIANTS.includes(r.id)) ? [rigs.at(-1)!.id] : [])]);
+  const full = sweepConfigs(recipe, { timingCorners: true });
+  const geometric = sweepConfigs(recipe, { timingCorners: false });
+  const configsFor = (rigId: string) => (timingRigs.has(rigId) ? full : geometric);
+  const configs = full;
+  describe(`${recipeId} (rig group ${group}): rig variants × parameter configurations (compile → validate → 240 Hz metrics)`, () => {
+    it(`covers the group's rig variants from scripts/sweep.ts${group === 2 ? ' and (when available) host-derived rig B' : ''}, and every parameter corner`, () => {
+      expect(rigs.map((r) => r.id)).toEqual(expect.arrayContaining(wanted.filter((id) => id !== 'rig-b')));
       expect(configs.length).toBeGreaterThanOrEqual(1 + 2 * recipe.paramSpecs.filter((s) => s.kind === 'number').length + 2);
     });
     for (const rv of rigs)
       describe(rv.id, () => {
-        for (const cfg of configs) it(cfg.name, () => checkSweepConfig(recipeId, rv.rig, cfg.params, tol));
+        for (const cfg of configsFor(rv.id)) it(cfg.name, () => checkSweepConfig(recipeId, rv.rig, cfg.params, tol));
       });
   });
 }

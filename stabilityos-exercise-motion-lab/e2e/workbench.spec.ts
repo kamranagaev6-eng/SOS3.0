@@ -204,8 +204,16 @@ test.describe('workbench', () => {
       await expect(page.getByTestId('comparison-label-primary')).toContainText('Stabilized');
       await expect.poll(async () => (await state(page)).split).toBe('side-by-side');
       await expect.poll(async () => (await state(page)).stats!.drawCalls).toBeGreaterThan(callsSingle * 1.5);
+      // Labels sit over their own halves: baseline left, solved tier right.
+      const cv = (await page.getByTestId('stage-canvas').boundingBox())!;
+      const la = (await page.getByTestId('comparison-label-baseline').boundingBox())!;
+      const lb = (await page.getByTestId('comparison-label-primary').boundingBox())!;
+      expect(la.x + la.width).toBeLessThanOrEqual(cv.x + cv.width / 2);
+      expect(lb.x).toBeGreaterThanOrEqual(cv.x + cv.width / 2);
+      await expect(page.locator('.stage-wrap')).toHaveAttribute('data-split', 'side-by-side');
       await page.keyboard.press('c');
       await expect.poll(async () => (await state(page)).comparison).toBe(false);
+      await expect(page.locator('.stage-wrap')).toHaveAttribute('data-split', 'none');
 
       // Parameter out of range: inline error, then reset to defaults clears it.
       const firstNumber = page.locator('[data-testid="param-editor"] input[type="number"]').first();
@@ -311,6 +319,10 @@ test.describe('workbench', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     await ready(page);
+    // Check after every panel has content (live diagnostics table, whole-clip metrics table).
+    await page.evaluate(() => window.__motionLab!.seek(2.3));
+    await expect(page.getByTestId('contact-table')).toBeVisible();
+    await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
     const overflow = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, bw: document.body.scrollWidth }));
     expect(overflow.sw).toBeLessThanOrEqual(overflow.cw);
     expect(overflow.bw).toBeLessThanOrEqual(overflow.cw);
@@ -324,8 +336,11 @@ test.describe('workbench', () => {
     // Comparison stacks vertically on a narrow stage.
     await page.getByTestId('comparison-toggle').check();
     await expect.poll(async () => (await state(page)).split).toBe('stacked');
+    await page.waitForTimeout(500);
     const overflow2 = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
     expect(overflow2).toBe(true);
+    await page.getByTestId('stage-canvas').scrollIntoViewIfNeeded();
+    await shot(page, 'mobile-390x844-comparison-stacked', { keepScroll: true });
     expect(errors).toEqual([]);
   });
 
@@ -432,6 +447,51 @@ test.describe('workbench', () => {
     await expect(report).toContainText('Round trip within tolerance');
     await report.scrollIntoViewIfNeeded();
     await shot(page, 'export-roundtrip-verified', { keepScroll: true });
+    expect(errors).toEqual([]);
+  });
+
+  test('resource hygiene: switching recipes, rigs and comparison does not grow GPU or owned resources', async ({ page }) => {
+    const errors = trackConsole(page);
+    await page.goto('/?recipe=bilateral-squat.v1');
+    await ready(page, 'bilateral-squat.v1');
+    await page.evaluate(() => window.__motionLab!.seek(2));
+    await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
+    await waitRendered(page);
+    const counts = async () => {
+      await waitRendered(page);
+      const st = (await state(page)).stats!;
+      return { owned: st.ownedGeometries, materials: st.ownedMaterials, gpu: st.gpuGeometries, textures: st.gpuTextures, objects: st.sceneObjects };
+    };
+    const rigSelect = page.getByTestId('rig-select');
+    const rigB = (await rigSelect.locator('option').allTextContents()).find((o) => o.startsWith('Rig B'))!;
+    // Round 0 is a warm-up: it uploads first-use resources (e.g. the comparison layer, which stays
+    // owned and GPU-resident while hidden). Rounds 1..3 must not grow anything.
+    let before: Awaited<ReturnType<typeof counts>> | null = null;
+    for (let round = 0; round < 4; round++) {
+      if (round === 1) {
+        await page.evaluate(() => window.__motionLab!.seek(2));
+        await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
+        before = await counts();
+      }
+      for (const id of ['sit-to-stand.v1', 'step-up-down.v1', 'bilateral-heel-raise.v1', 'bilateral-squat.v1']) {
+        await selectRecipe(page, id);
+        await page.evaluate(() => window.__motionLab!.seek(2));
+        await waitRendered(page);
+      }
+      await page.getByTestId('comparison-toggle').check();
+      await rigSelect.selectOption({ label: rigB });
+      await expect.poll(async () => (await state(page)).planOk).toBe(true);
+      await waitRendered(page);
+      await rigSelect.selectOption({ index: 0 });
+      await expect.poll(async () => (await state(page)).planOk).toBe(true);
+      await page.getByTestId('comparison-toggle').uncheck();
+      await expect.poll(async () => (await state(page)).comparison).toBe(false);
+    }
+    await page.evaluate(() => window.__motionLab!.seek(2));
+    // Trajectories arrive asynchronously from the analysis worker.
+    await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
+    expect(before).not.toBeNull();
+    await expect.poll(counts, { timeout: 10_000 }).toEqual(before);
     expect(errors).toEqual([]);
   });
 

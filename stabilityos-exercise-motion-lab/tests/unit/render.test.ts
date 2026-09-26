@@ -240,6 +240,18 @@ describe('render adapter scene graph', () => {
     sg.setPose(null);
     expect(sg.layers[0].overlay.visibleCounts().targets).toBe(0);
     expect(countObjects(sg.layers[0].overlay.group).total).toBe(pooled.total);
+
+    // A new plan with the same rig: resetOverlays drops pooled objects and the trajectory.
+    const empty = countObjects(sg.layers[0].overlay.group).total;
+    sg.setTrajectory([[0, 1, 0], [0, 1.1, 0.1]]);
+    sg.setPose(makePose(rig, four));
+    expect(countObjects(sg.layers[0].overlay.group).total).toBeGreaterThan(empty);
+    const owned = sg.ownedCounts().geometries;
+    sg.resetOverlays();
+    expect(countObjects(sg.layers[0].overlay.group).total).toBe(empty);
+    expect(sg.layers[0].overlay.visibleCounts().trajectoryPoints).toBe(0);
+    expect(sg.ownedCounts().geometries).toBe(owned - 1); // trajectory geometry disposed
+    expect(sg.layers[0].humanoid!.group.visible).toBe(false); // old plan's pose is gone
     sg.dispose();
   });
 

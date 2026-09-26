@@ -30,7 +30,9 @@ export function StageView(props: StageViewProps) {
   const [stage, setStage] = useState<Stage | null>(null);
   const [unavailable, setUnavailable] = useState<string | null>(null);
   const [contextLost, setContextLost] = useState(false);
-  const [split, setSplit] = useState<SplitLayout>('none');
+  const [aspect, setAspect] = useState(16 / 9);
+  // Same rule as the stage's viewport split (render/stage.ts), derived from props so labels never lag.
+  const split: SplitLayout = props.comparison ? (aspect >= 1.1 ? 'side-by-side' : 'stacked') : 'none';
   const { controller, onAvailability } = props;
 
   useEffect(() => {
@@ -49,9 +51,15 @@ export function StageView(props: StageViewProps) {
     controller.attachStage(s);
     setStage(s);
     onAvailability(true, null);
+    const measure = (): void => {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (w > 0 && h > 0) setAspect(w / h);
+    };
+    measure();
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => {
       s?.resize();
-      if (s) setSplit(s.getSplit());
+      measure();
     }) : null;
     ro?.observe(canvas);
     return () => {
@@ -76,9 +84,6 @@ export function StageView(props: StageViewProps) {
   useEffect(() => {
     stage?.setInspectionSide(props.inspectSide);
   }, [stage, props.inspectSide]);
-  useEffect(() => {
-    if (stage) setSplit(stage.getSplit());
-  }, [stage, props.comparison]);
 
   const showComparisonLabels = props.comparison && !unavailable && !props.blocker;
   return (

@@ -212,3 +212,16 @@ describe('time domain: out-of-range t clamps, non-finite t throws RangeError', (
     });
   }
 });
+
+describe('the bitwise comparator has teeth', () => {
+  it('detects a 1-ulp time change, a sign-of-zero change and a structural change', () => {
+    const sub = subjects[0]!;
+    const t = 3.21;
+    const a = samplePose(sub.plan, sub.rig, t);
+    const b = samplePose(sub.plan, sub.rig, t + 4 * Number.EPSILON * t);
+    expect(firstBitDiff(a, b)).not.toBeNull();
+    expect(firstBitDiff([0], [-0])).not.toBeNull();
+    expect(firstBitDiff({ a: [1, 2] }, { a: [1, 2, 3] })).not.toBeNull();
+    expect(firstBitDiff(a, samplePose(sub.plan, sub.rig, t))).toBeNull();
+  });
+});

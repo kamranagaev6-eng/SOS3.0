@@ -31,6 +31,8 @@ export interface StageScene {
   setPose(primary: StagePose | null, comparison?: StagePose | null): void;
   setTrajectory(primary: readonly Vec3[] | null, comparison?: readonly Vec3[] | null): void;
   setHostBones(bones: readonly HostBoneView[] | null): void;
+  /** Drops the current poses, pooled per-sample overlay objects, trajectories and host bones (new plan). */
+  resetOverlays(): void;
   setOverlays(flags: Partial<OverlayFlags>): void;
   getOverlays(): OverlayFlags;
   setInspectionSide(side: Side | null): void;
@@ -156,6 +158,18 @@ export function createStageScene(options: { ledger?: ResourceLedger | null; dark
       if (disposed) return;
       hostOverlay.set(bones);
       hostOverlay.setVisible(flags.hostBones);
+      bump();
+    },
+    resetOverlays() {
+      if (disposed) return;
+      for (const layer of layers) {
+        // The old plan's pose goes too; the next setPose (next frame) shows the new plan.
+        layer.pose = null;
+        layer.overlay.clear();
+        layer.overlay.setTrajectory(null);
+        refreshLayer(layer);
+      }
+      hostOverlay.set(null);
       bump();
     },
     setOverlays(partial) {

@@ -1,0 +1,597 @@
+{
+  "generatedAt": "2026-09-26T03:02:02.398Z",
+  "kind": "workbench render benchmark (in-browser, Playwright)",
+  "statement": "Engine sampling and rendering are measured separately per rAF-paced frame. Render timings include renderer.render CPU time and, separately, render + gl.finish(). WebGL ran on a SOFTWARE rasteriser (SwiftShader) in a headless container: render numbers are software-rendered and NOT representative of client GPUs.",
+  "softwareRendered": true,
+  "environment": {
+    "browser": "chromium 141.0.7390.37",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.37 Safari/537.36",
+    "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "webglVendor": "Google Inc. (Google)",
+    "webglVersion": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "hardwareConcurrency": 4,
+    "devicePixelRatio": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "host": {
+      "platform": "linux",
+      "arch": "x64",
+      "cpus": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+      "cpuCount": 4,
+      "node": "v24.21.0"
+    }
+  },
+  "method": {
+    "framesPerRun": 600,
+    "warmupFrames": 10,
+    "timeStep": "1/60 s, wrapping at the clip duration",
+    "solverTier": "stabilized (plus baseline in comparison mode)",
+    "overlays": "workbench defaults (contact targets, sites, residuals, trajectory, failures)",
+    "pacing": "requestAnimationFrame (one measured frame per callback)",
+    "clock": "performance.now(); Chromium clamps it (see timerResolutionMs per run), so sub-resolution values read as 0"
+  },
+  "results": [
+    {
+      "recipeId": "sit-to-stand.v1",
+      "mode": "normal (stabilized)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 1,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 49,
+      "trianglesPerFrame": 10190,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.2,
+          "p99": 0.3,
+          "max": 3.3,
+          "mean": 0.1573
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.1,
+          "p99": 0.3,
+          "max": 4.1,
+          "mean": 0.0632
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.5,
+          "p95": 2.1,
+          "p99": 4.5,
+          "max": 7.2,
+          "mean": 0.7193
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.5,
+          "p95": 2.1,
+          "p99": 4.5,
+          "max": 7.2,
+          "mean": 0.7425
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.4,
+          "p50": 0.8,
+          "p95": 2.8,
+          "p99": 4.8,
+          "max": 7.5,
+          "mean": 1.0223
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.7,
+          "p50": 66.7,
+          "p95": 100.1,
+          "p99": 116.8,
+          "max": 283.2,
+          "mean": 70.9486
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "sit-to-stand.v1",
+      "mode": "comparison (baseline + stabilized, split viewport)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 2,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 102,
+      "trianglesPerFrame": 21940,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.2,
+          "p95": 0.3,
+          "p99": 0.7,
+          "max": 4.2,
+          "mean": 0.2333
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.1,
+          "p99": 0.4,
+          "max": 3.2,
+          "mean": 0.0705
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.4,
+          "p50": 0.7,
+          "p95": 2.1,
+          "p99": 4.5,
+          "max": 233.7,
+          "mean": 1.3207
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.4,
+          "p50": 0.8,
+          "p95": 2.2,
+          "p99": 4.6,
+          "max": 233.7,
+          "mean": 1.3662
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.7,
+          "p50": 1.1,
+          "p95": 2.7,
+          "p99": 5,
+          "max": 234.5,
+          "mean": 1.7458
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.6,
+          "p50": 83.4,
+          "p95": 133.4,
+          "p99": 166.7,
+          "max": 233.3,
+          "mean": 90.7309
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "bilateral-squat.v1",
+      "mode": "normal (stabilized)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 1,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 40,
+      "trianglesPerFrame": 10038,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.2,
+          "p99": 0.3,
+          "max": 1.6,
+          "mean": 0.1322
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.1,
+          "p99": 0.2,
+          "max": 0.4,
+          "mean": 0.034
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.6,
+          "p95": 2.4,
+          "p99": 4.8,
+          "max": 14.5,
+          "mean": 0.8185
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.6,
+          "p95": 2.5,
+          "p99": 4.9,
+          "max": 14.5,
+          "mean": 0.8457
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.3,
+          "p50": 0.8,
+          "p95": 2.7,
+          "p99": 5,
+          "max": 14.6,
+          "mean": 1.0518
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.7,
+          "p50": 66.7,
+          "p95": 100,
+          "p99": 116.7,
+          "max": 150,
+          "mean": 69.9471
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "bilateral-squat.v1",
+      "mode": "comparison (baseline + stabilized, split viewport)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 2,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 84,
+      "trianglesPerFrame": 21636,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.2,
+          "p95": 0.3,
+          "p99": 0.4,
+          "max": 3.3,
+          "mean": 0.2062
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.1,
+          "p99": 0.2,
+          "max": 1.6,
+          "mean": 0.0485
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.6,
+          "p95": 1.2,
+          "p99": 2.6,
+          "max": 3.7,
+          "mean": 0.6548
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.3,
+          "p50": 0.6,
+          "p95": 1.4,
+          "p99": 3,
+          "max": 5,
+          "mean": 0.6912
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.5,
+          "p50": 0.9,
+          "p95": 1.8,
+          "p99": 3.6,
+          "max": 6.2,
+          "mean": 1.0087
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.6,
+          "p50": 50,
+          "p95": 100,
+          "p99": 133.3,
+          "max": 150,
+          "mean": 57.7608
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "step-up-down.v1",
+      "mode": "normal (stabilized)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 1,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 39,
+      "trianglesPerFrame": 9858,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.3,
+          "p99": 0.5,
+          "max": 2.6,
+          "mean": 0.1565
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.1,
+          "p99": 0.2,
+          "max": 0.3,
+          "mean": 0.0428
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.4,
+          "p95": 1.2,
+          "p99": 3.8,
+          "max": 5.2,
+          "mean": 0.5617
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.4,
+          "p95": 1.3,
+          "p99": 3.9,
+          "max": 5.9,
+          "mean": 0.5928
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.3,
+          "p50": 0.7,
+          "p95": 1.6,
+          "p99": 4.1,
+          "max": 6.2,
+          "mean": 0.8215
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.5,
+          "p50": 66.6,
+          "p95": 116.6,
+          "p99": 150,
+          "max": 183.4,
+          "mean": 61.2663
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "step-up-down.v1",
+      "mode": "comparison (baseline + stabilized, split viewport)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 2,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 76,
+      "trianglesPerFrame": 19548,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0.1,
+          "p50": 0.2,
+          "p95": 0.4,
+          "p99": 1,
+          "max": 4,
+          "mean": 0.2512
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.2,
+          "p99": 0.3,
+          "max": 3.3,
+          "mean": 0.072
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.4,
+          "p50": 0.7,
+          "p95": 2.2,
+          "p99": 4.3,
+          "max": 6.5,
+          "mean": 0.9902
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.4,
+          "p50": 0.8,
+          "p95": 2.3,
+          "p99": 4.8,
+          "max": 7.2,
+          "mean": 1.0413
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.7,
+          "p50": 1.2,
+          "p95": 3,
+          "p99": 5,
+          "max": 8,
+          "mean": 1.4432
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.6,
+          "p50": 83.4,
+          "p95": 150,
+          "p99": 183.3,
+          "max": 216.7,
+          "mean": 94.1254
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "bilateral-heel-raise.v1",
+      "mode": "normal (stabilized)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 1,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 38,
+      "trianglesPerFrame": 9910,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.2,
+          "p99": 0.4,
+          "max": 2.4,
+          "mean": 0.1432
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.1,
+          "p99": 0.2,
+          "max": 0.3,
+          "mean": 0.0373
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.5,
+          "p95": 1.6,
+          "p99": 4.5,
+          "max": 7.1,
+          "mean": 0.6667
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.2,
+          "p50": 0.5,
+          "p95": 1.7,
+          "p99": 4.7,
+          "max": 7.1,
+          "mean": 0.706
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.4,
+          "p50": 0.7,
+          "p95": 2,
+          "p99": 4.9,
+          "max": 7.5,
+          "mean": 0.9228
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.6,
+          "p50": 66.7,
+          "p95": 116.7,
+          "p99": 166.6,
+          "max": 283.3,
+          "mean": 73.8701
+        }
+      },
+      "timerResolutionMs": 0.1
+    },
+    {
+      "recipeId": "bilateral-heel-raise.v1",
+      "mode": "comparison (baseline + stabilized, split viewport)",
+      "frames": 600,
+      "samplePoseCallsPerFrame": 2,
+      "canvasCssPx": {
+        "width": 550,
+        "height": 496,
+        "pixelRatio": 1
+      },
+      "drawCallsPerFrame": 74,
+      "trianglesPerFrame": 19652,
+      "ms": {
+        "engineSampling": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.2,
+          "p95": 0.3,
+          "p99": 0.7,
+          "max": 4.8,
+          "mean": 0.2305
+        },
+        "stageUpdate": {
+          "n": 600,
+          "min": 0,
+          "p50": 0.1,
+          "p95": 0.1,
+          "p99": 0.2,
+          "max": 0.7,
+          "mean": 0.0567
+        },
+        "renderCpu": {
+          "n": 600,
+          "min": 0.3,
+          "p50": 0.6,
+          "p95": 1.8,
+          "p99": 3.8,
+          "max": 5,
+          "mean": 0.8448
+        },
+        "renderPlusGlFinish": {
+          "n": 600,
+          "min": 0.3,
+          "p50": 0.7,
+          "p95": 1.9,
+          "p99": 3.8,
+          "max": 5,
+          "mean": 0.8728
+        },
+        "wholeFrame": {
+          "n": 600,
+          "min": 0.7,
+          "p50": 1,
+          "p95": 2.4,
+          "p99": 4.3,
+          "max": 5.5,
+          "mean": 1.2273
+        },
+        "rafInterval": {
+          "n": 599,
+          "min": 16.6,
+          "p50": 83.3,
+          "p95": 133.3,
+          "p99": 166.7,
+          "max": 183.4,
+          "mean": 76.7082
+        }
+      },
+      "timerResolutionMs": 0.1
+    }
+  ]
+}

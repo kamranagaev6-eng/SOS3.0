@@ -53,6 +53,10 @@ export interface RenderBenchRun {
   renderFinishMs: number[];
   /** Whole frame (sample + update + render [+ finish]), ms. */
   frameMs: number[];
+  /** requestAnimationFrame callback-to-callback interval (includes compositing / presentation), ms. */
+  rafIntervalMs: number[];
+  /** Smallest observable performance.now() step in this context, ms. */
+  timerResolutionMs: number;
   stats: StageStats | null;
   gpu: { renderer: string; vendor: string; webglVersion: string } | null;
   canvas: { width: number; height: number; pixelRatio: number } | null;
@@ -62,6 +66,21 @@ declare global {
   interface Window {
     __motionLab?: MotionLabTestHook;
   }
+}
+
+const WARMUP_FRAMES = 10;
+
+function timerResolution(): number {
+  let min = Infinity;
+  let prev = performance.now();
+  for (let k = 0; k < 20000 && min > 0.001; k++) {
+    const now = performance.now();
+    if (now > prev) {
+      min = Math.min(min, now - prev);
+      prev = now;
+    }
+  }
+  return Math.round(min * 1e6) / 1e6;
 }
 
 export function shouldInstallTestHook(): boolean {
@@ -118,19 +137,13 @@ export function installTestHook(controller: ViewerController, getState: () => Om
         renderCpuMs: [],
         renderFinishMs: [],
         frameMs: [],
+        rafIntervalMs: [],
+        timerResolutionMs: timerResolution(),
         stats: null,
         gpu: stage ? stage.getGpuInfo() : null,
         canvas: null,
       };
-      // Warm-up (shader compilation, JIT) is excluded from the measurement.
-      for (let i = 0; i < 10; i++) {
-        const t = (i / fps) % plan.duration;
-        const p = samplePose(plan, rig, t, tier);
-        const c = comparison ? samplePose(plan, rig, t, 'baseline') : null;
-        stage?.setPose(p, c);
-        stage?.renderAndFinish();
-      }
-      for (let i = 0; i < frames; i++) {
+      const measureFrame = (i: number): void => {
         const t = (i / fps) % plan.duration;
         const f0 = performance.now();
         const p = samplePose(plan, rig, t, tier);
@@ -140,14 +153,28 @@ export function installTestHook(controller: ViewerController, getState: () => Om
         const f2 = performance.now();
         const r = stage ? (finish ? stage.renderAndFinish() : stage.render()) : { renderCpuMs: 0, renderFinishMs: 0 };
         const f3 = performance.now();
+        if (i < 0) return; // warm-up frames (shader compilation, JIT) are not recorded
         out.sampleMs.push(f1 - f0);
         out.updateMs.push(f2 - f1);
         out.renderCpuMs.push(r.renderCpuMs);
         out.renderFinishMs.push(r.renderFinishMs);
         out.frameMs.push(f3 - f0);
-        // Yield occasionally so the page stays responsive to the test runner.
-        if (i % 100 === 99) await new Promise((res) => setTimeout(res, 0));
-      }
+      };
+      // Frames are paced by requestAnimationFrame, as in the real workbench, so the browser presents
+      // every frame (a back-to-back loop lets the GPU command buffer back up and flush in bursts).
+      await new Promise<void>((resolve) => {
+        let i = -WARMUP_FRAMES;
+        let last = -1;
+        const step = (now: number): void => {
+          if (i > 0 && last >= 0) out.rafIntervalMs.push(now - last);
+          last = now;
+          measureFrame(i);
+          i++;
+          if (i < frames) requestAnimationFrame(step);
+          else resolve();
+        };
+        requestAnimationFrame(step);
+      });
       if (stage) {
         const s = stage.getStats();
         out.stats = s;

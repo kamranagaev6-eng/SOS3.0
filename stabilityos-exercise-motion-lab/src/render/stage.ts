@@ -194,6 +194,7 @@ export function createStage(canvas: HTMLCanvasElement, options: StageOptions & {
     setPose: (p, c) => sg.setPose(p, c ?? null),
     setTrajectory: (p, c) => sg.setTrajectory(p, c ?? null),
     setHostBones: (b) => sg.setHostBones(b),
+    resetOverlays: () => sg.resetOverlays(),
     setOverlays: (f) => sg.setOverlays(f),
     getOverlays: () => sg.getOverlays(),
     setInspectionSide: (s) => sg.setInspectionSide(s),

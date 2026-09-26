@@ -9,10 +9,16 @@ import { environmentSchema } from './environment.ts';
  * reproduced by sampling the plan at any time t.
  */
 
+/**
+ * Size limits: validation and the compile-time scan cost grow with duration and key counts, so
+ * imported plans are bounded (no recipe needs more than ~20 s; limits leave wide headroom).
+ */
+export const PLAN_LIMITS = { maxDuration: 600, maxKeys: 10_000, maxPhases: 256, maxCues: 256, maxFootStates: 512, maxSeatIntervals: 64 } as const;
+
 /** 'stop' keys have zero tangent (motion eases in/out); 'flow' keys pass through with a monotone tangent. */
 export const scalarKeySchema = z.object({ t: nonNegative, v: finite, mode: z.enum(['stop', 'flow']) });
 export type ScalarKey = z.infer<typeof scalarKeySchema>;
-export const trackSchema = z.object({ keys: z.array(scalarKeySchema).min(1) });
+export const trackSchema = z.object({ keys: z.array(scalarKeySchema).min(1).max(PLAN_LIMITS.maxKeys) });
 export type Track = z.infer<typeof trackSchema>;
 
 export const phaseSchema = z.object({
@@ -93,9 +99,9 @@ export const seatContactSchema = z.object({
   surface: identifier,
   /** World target of the rig's `seat` site while in contact. */
   target: vec3Schema,
-  intervals: z.array(
-    z.object({ start: nonNegative, end: nonNegative, blendIn: nonNegative, blendOut: nonNegative }),
-  ),
+  intervals: z
+    .array(z.object({ start: nonNegative, end: nonNegative, blendIn: nonNegative, blendOut: nonNegative }))
+    .max(PLAN_LIMITS.maxSeatIntervals),
 });
 export type SeatContact = z.infer<typeof seatContactSchema>;
 
@@ -130,13 +136,16 @@ export const planSchema = z.object({
   }),
   rig: z.object({ id: identifier, fingerprint: z.string() }),
   environment: environmentSchema,
-  duration: positive,
-  phases: z.array(phaseSchema).min(1),
-  cues: z.array(cueSchema),
+  duration: positive.refine((v) => v <= PLAN_LIMITS.maxDuration, { message: `duration must be ≤ ${PLAN_LIMITS.maxDuration} s` }),
+  phases: z.array(phaseSchema).min(1).max(PLAN_LIMITS.maxPhases),
+  cues: z.array(cueSchema).max(PLAN_LIMITS.maxCues),
   pelvis: pelvisChannelsSchema,
   /** Spine, neck and arm DOF tracks: joints[jointName][dofName]. */
   joints: z.record(z.string(), z.record(z.string(), trackSchema)),
-  feet: z.object({ left: z.array(footStateSchema).min(1), right: z.array(footStateSchema).min(1) }),
+  feet: z.object({
+    left: z.array(footStateSchema).min(1).max(PLAN_LIMITS.maxFootStates),
+    right: z.array(footStateSchema).min(1).max(PLAN_LIMITS.maxFootStates),
+  }),
   seat: seatContactSchema.nullable(),
   stabilization: stabilizationSchema,
   assumptions: z.array(z.string()),
