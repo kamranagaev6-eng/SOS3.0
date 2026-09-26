@@ -62,7 +62,10 @@ function build(v: Values, rig: RigDefinition) {
     };
   const H = num(v, 'chairHeight');
   const p = rig.proportions;
-  const L = p.left.leg;
+  // Seated geometry from the mean of both legs, so the compiler is mirror-equivariant for
+  // asymmetric rigs (a right-long-leg subject gets the mirror image of a left-long-leg one).
+  const mean = (k: 'thigh' | 'shank' | 'ankleHeight') => (p.left.leg[k] + p.right.leg[k]) / 2;
+  const L = { thigh: mean('thigh'), shank: mean('shank'), ankleHeight: mean('ankleHeight') };
   const hipY = H + p.pelvis.seatDrop - p.pelvis.hipDrop;
   const kneeY = L.ankleHeight + L.shank;
   const drop = hipY - kneeY;
