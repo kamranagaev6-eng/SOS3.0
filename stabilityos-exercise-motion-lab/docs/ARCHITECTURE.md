@@ -81,7 +81,7 @@ recipeId + params ──compileRecipe(rig)──► MotionPlan ──samplePose(
 
 | Tier | What | Evidence |
 |---|---|---|
-| baseline | solved joint angles replayed with the pelvis frozen at its t = 0 transform — the host's current behaviour | planted-foot displacement 46–646 mm, penetration up to 469 mm (`evidence/METRICS.md`) |
+| baseline | solved joint angles replayed with the pelvis frozen at its t = 0 transform — the host's current behaviour | planted-foot displacement 46–646 mm, penetration up to 478 mm (`evidence/METRICS.md`) |
 | 1 analytic | authored pelvis + closed-form IK + closed-form foot poses | within tolerance in 350 / 469 compiled sweep configs; all failures in the step-up (14 / 133 pass) |
 | 2 stabilised | tier 1 + bounded pelvis-translation correction | within tolerance in 469 / 469 (step-up 133 / 133); median max correction 1.2 mm |
 
