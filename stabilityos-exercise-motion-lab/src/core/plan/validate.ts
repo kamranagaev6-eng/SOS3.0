@@ -7,7 +7,7 @@ import { footSites } from '../rig/canonical.ts';
 import { getRigModel, rigFingerprint } from '../rig/model.ts';
 import { contactPose, footGeom, footTargetAt, siteUnderTarget } from '../solver/footPose.ts';
 import { TOLERANCES } from '../tolerances.ts';
-import { validateTrackKeys } from './tracks.ts';
+import { evalTrack, validateTrackKeys } from './tracks.ts';
 
 const EPS = 1e-9;
 /** Upper bound on author-declared stabilisation: larger corrections could change the exercise itself. */
@@ -140,15 +140,17 @@ function validateFootStates(plan: MotionPlan, rig: RigDefinition, side: Side): D
             hint: 'Insert a swing state between contacts at different locations.',
           }),
         );
+      // Evaluate the heel-lift CURVE at the boundary (not a key value): the heel must be down exactly
+      // where a flat contact begins or ends, otherwise the heel would jump.
       if (prev.kind === 'forefoot' && s.kind === 'flat') {
-        const lastLift = prev.heelLift.keys.at(-1)!.v;
-        if (Math.abs(lastLift) > 1e-9)
-          out.push(diag('CONTRADICTORY_CONTACTS', 'error', `${side} heel is ${lastLift} m up when a flat contact begins at ${s.start}s`, { path }));
+        const lift = evalTrack(prev.heelLift, s.start);
+        if (Math.abs(lift) > 1e-9)
+          out.push(diag('CONTRADICTORY_CONTACTS', 'error', `${side} heel is ${lift.toFixed(4)} m up when a flat contact begins at ${s.start}s`, { path }));
       }
       if (prev.kind === 'flat' && s.kind === 'forefoot') {
-        const firstLift = s.heelLift.keys[0]!;
-        if (Math.abs(firstLift.v) > 1e-9 || Math.abs(firstLift.t - s.start) > EPS)
-          out.push(diag('CONTRADICTORY_CONTACTS', 'error', `${side} heel must start at 0 lift when leaving a flat contact (t=${s.start}s)`, { path }));
+        const lift = evalTrack(s.heelLift, s.start);
+        if (Math.abs(lift) > 1e-9)
+          out.push(diag('CONTRADICTORY_CONTACTS', 'error', `${side} heel must start at 0 lift when leaving a flat contact (t=${s.start}s; lift ${lift.toFixed(4)} m)`, { path }));
       }
     }
   });

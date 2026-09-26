@@ -117,7 +117,7 @@ function build(v: Values, rig: RigDefinition) {
     flatStart = lowerEnd;
   }
   for (const s of SIDES) feet[s].push({ kind: 'flat', start: flatStart, end: pb.t, surface: 'floor', anchor: anchors[s] });
-  const { pelvis, joints } = tracksFromKeys(keys);
+  const { pelvis, joints } = tracksFromKeys(keys, rig);
   const plan = basePlan({
     duration: pb.t,
     phases: pb.phases,

@@ -19,6 +19,17 @@ export type Values = Record<string, number | string>;
 /** Type/range/enum checks against the recipe's ParamSpecs. Unknown keys are rejected, missing ones take defaults. */
 export function validateParams(specs: readonly ParamSpec[], params: ParamRecord): { values: Values; diagnostics: Diagnostic[] } {
   const out: Diagnostic[] = [];
+  if (params === null || typeof params !== 'object' || Array.isArray(params)) {
+    return {
+      values: {},
+      diagnostics: [
+        diag('SCHEMA_INVALID', 'error', `parameters must be an object of key → value (got ${params === null ? 'null' : Array.isArray(params) ? 'array' : typeof params})`, {
+          path: 'params',
+          hint: 'Pass {} to use every default.',
+        }),
+      ],
+    };
+  }
   const values: Values = {};
   const known = new Set(specs.map((s) => s.key));
   for (const k of Object.keys(params))
@@ -81,8 +92,13 @@ export interface BodyKey {
 export const SPINE_DOFS = ['flexion', 'lateralFlexion', 'axialRotation'] as const;
 export const SHOULDER_DOFS = ['flexion', 'abduction', 'internalRotation'] as const;
 
-/** Convert whole-body keys to plan channels. Keys must have strictly increasing times. */
-export function tracksFromKeys(keys: readonly BodyKey[]): { pelvis: PelvisChannels; joints: MotionPlan['joints'] } {
+/**
+ * Convert whole-body keys to plan channels. Keys must have strictly increasing times. Tracks for
+ * joints the rig does not have (optional articulation, e.g. no neck or arms) are omitted; required
+ * joints are enforced earlier by validateRig / capability checks.
+ */
+export function tracksFromKeys(keys: readonly BodyKey[], rig: RigDefinition): { pelvis: PelvisChannels; joints: MotionPlan['joints'] } {
+  const has = (j: string) => rig.joints.some((x) => x.name === j);
   const tr = (f: (k: BodyKey) => number): Track => ({ keys: keys.map((k) => ({ t: k.t, v: f(k), mode: k.mode })) });
   const joints: MotionPlan['joints'] = {};
   for (const [name, get] of [
@@ -90,12 +106,12 @@ export function tracksFromKeys(keys: readonly BodyKey[]): { pelvis: PelvisChanne
     ['thoracic', (k: BodyKey) => k.thoracic],
     ['neck', (k: BodyKey) => k.neck],
   ] as const) {
-    joints[name] = Object.fromEntries(SPINE_DOFS.map((d, i) => [d, tr((k) => get(k)[i]!)]));
+    if (has(name)) joints[name] = Object.fromEntries(SPINE_DOFS.map((d, i) => [d, tr((k) => get(k)[i]!)]));
   }
   for (const side of SIDES) {
     const aj = armJoints(side);
-    joints[aj.shoulder] = Object.fromEntries(SHOULDER_DOFS.map((d, i) => [d, tr((k) => k.arms[side].shoulder[i]!)]));
-    joints[aj.elbow] = { flexion: tr((k) => k.arms[side].elbow) };
+    if (has(aj.shoulder)) joints[aj.shoulder] = Object.fromEntries(SHOULDER_DOFS.map((d, i) => [d, tr((k) => k.arms[side].shoulder[i]!)]));
+    if (has(aj.elbow)) joints[aj.elbow] = { flexion: tr((k) => k.arms[side].elbow) };
   }
   return {
     pelvis: {
@@ -180,7 +196,7 @@ export function compileWith(
   build: (v: Values, rig: RigDefinition) => BuildOutput,
 ): CompileResult {
   const rv = validateRig(rigInput);
-  if (!rv.rig) return { ok: false, plan: null, diagnostics: rv.diagnostics };
+  if (!rv.rig || hasErrors(rv.diagnostics)) return { ok: false, plan: null, diagnostics: rv.diagnostics };
   const rig = rigInput;
   const missing = def.requiredCapabilities.filter((c) => !rig.capabilities.includes(c));
   if (missing.length)

@@ -156,7 +156,7 @@ test.describe('workbench', () => {
         await page.keyboard.press(key);
         await expect.poll(async () => (await state(page)).view).toBe(view);
       }
-      await page.getByTestId('view-presets').getByText('Front', { exact: true }).click();
+      await page.getByRole('radio', { name: 'Front', exact: true }).check();
       await expect.poll(async () => (await state(page)).view).toBe('front');
       // Left/right inspection (L / R): side view from that side.
       await focusNeutral(page);
@@ -217,7 +217,7 @@ test.describe('workbench', () => {
       // Representative screenshot with overlays at a key phase.
       const showcase = s.phases.find((p) => p.id === r.showcase) ?? s.phases[Math.floor(s.phases.length / 2)]!;
       await page.getByTestId('overlay-magnifyResiduals').check();
-      await page.getByTestId('view-presets').getByText('Oblique', { exact: true }).click();
+      await page.getByRole('radio', { name: 'Oblique', exact: true }).check();
       await page.evaluate((t) => window.__motionLab!.seek(t), (showcase.start + showcase.end) / 2);
       await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
       await waitRendered(page);
@@ -262,7 +262,7 @@ test.describe('workbench', () => {
       const s = await ready(page, id);
       await page.getByTestId('comparison-toggle').check();
       await expect.poll(async () => (await state(page)).comparison).toBe(true);
-      await page.getByTestId('view-presets').getByText('Left side', { exact: true }).click();
+      await page.getByRole('radio', { name: 'Left side', exact: true }).check();
       const p = s.phases.find((x) => phaseMatch.test(x.id)) ?? s.phases[1]!;
       await page.evaluate((t) => window.__motionLab!.seek(t), p.end - 0.05 * (p.end - p.start));
       await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });

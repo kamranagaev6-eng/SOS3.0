@@ -4,6 +4,7 @@ import type { ParamSpec } from '../contracts/recipe.ts';
 import type { RigDefinition } from '../contracts/rig.ts';
 import { deg, lerp } from '../math/curves.ts';
 import type { Vec3 } from '../math/vec3.ts';
+import { SEAT_SITE } from '../rig/canonical.ts';
 import { flatPose, footGeom } from '../solver/footPose.ts';
 import { evaluateLegs, solveKeyPose } from '../solver/keyPose.ts';
 import {
@@ -49,6 +50,16 @@ const MID_KNEE = deg(55);
 
 function build(v: Values, rig: RigDefinition) {
   const diagnostics: Diagnostic[] = [];
+  if (!rig.sites.some((x) => x.name === SEAT_SITE))
+    return {
+      plan: null,
+      diagnostics: [
+        diag('MISSING_BONE', 'error', `rig '${rig.id}' has no '${SEAT_SITE}' contact site; sit-to-stand needs the pelvis seat contact point`, {
+          subject: SEAT_SITE,
+          hint: 'Provide the seat site in the bone map (sites.seat) or let the adapter estimate it.',
+        }),
+      ],
+    };
   const H = num(v, 'chairHeight');
   const p = rig.proportions;
   const L = p.left.leg;
@@ -144,7 +155,7 @@ function build(v: Values, rig: RigDefinition) {
   pb.add('seated-end', 'Seated', END, 'Seated upright.');
   keys.push(key(pb.t, 'stop', seated, 0, 15, 70));
 
-  const { pelvis, joints } = tracksFromKeys(keys);
+  const { pelvis, joints } = tracksFromKeys(keys, rig);
   const duration = pb.t;
   const plan = basePlan({
     duration,

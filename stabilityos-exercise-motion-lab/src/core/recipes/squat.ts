@@ -122,7 +122,7 @@ function build(v: Values, rig: RigDefinition) {
     pb.add(`stand-${r}`, `Stand ${r}`, num(v, 'standSeconds'), 'Standing pause.');
     keys.push(standKey(pb.t));
   }
-  const { pelvis, joints } = tracksFromKeys(keys);
+  const { pelvis, joints } = tracksFromKeys(keys, rig);
   const duration = pb.t;
   const plan = basePlan({
     duration,

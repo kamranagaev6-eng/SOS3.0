@@ -9,6 +9,7 @@ import { flatPose, footGeom, forefootPose } from '../solver/footPose.ts';
 import { evaluateLegs, solveKeyPose } from '../solver/keyPose.ts';
 import type { FootTarget } from '../solver/types.ts';
 import {
+  armsBoth,
   basePlan,
   compileWith,
   defaultsOf,
@@ -100,7 +101,7 @@ function build(v: Values, rig: RigDefinition) {
     if (!r.ok || !r.reachable)
       diagnostics.push(
         diag('KEYPOSE_UNSOLVED', 'error', `could not solve the '${name}' key pose (residual ${r.residual.toExponential(2)})`, {
-          hint: 'Step height / distances are geometrically inconsistent for this rig.',
+          hint: 'The step geometry and distances cannot be reached with this rig’s leg lengths and joint limits.',
         }),
       );
     return r.P;
@@ -111,7 +112,8 @@ function build(v: Values, rig: RigDefinition) {
   const stepBoth = { left: flatS('left'), right: flatS('right') };
 
   const P_stand = solve('stand-floor', floorBoth, 0, zFloor + 0.02, yInit, 0, 'min', STANDING_KNEE);
-  const P_shift = solve('weight-shift', floorBoth, 0.5 * x(B), zFloor + 0.02, yInit, 0, A, STANDING_KNEE);
+  // 'min': the straighter knee sets the height, so asymmetric leg lengths remain solvable.
+  const P_shift = solve('weight-shift', floorBoth, 0.5 * x(B), zFloor + 0.02, yInit, 0, 'min', STANDING_KNEE);
   // During the lead swing the pelvis travels forward over the trailing foot's forefoot so the
   // leading shank is not steeply inclined when the foot lands on the step.
   const P_leadLand = solve('lead-landing', pair(A, flatS(A), flatF(B)), 0.35 * x(B), zFloor + 0.02 + LEAD_SWING_TRAVEL, yInit, deg(4), B, deg(8));
@@ -138,7 +140,7 @@ function build(v: Values, rig: RigDefinition) {
     }
   }
   const P_top = solve('stand-step', stepBoth, 0, zStep + 0.02, yInit + H, 0, 'min', STANDING_KNEE);
-  const P_lowShift = solve('lower-shift', stepBoth, 0.5 * x(S), zStep + 0.02, yInit + H, 0, D, STANDING_KNEE);
+  const P_lowShift = solve('lower-shift', stepBoth, 0.5 * x(S), zStep + 0.02, yInit + H, 0, 'min', STANDING_KNEE);
   const lowerLean = deg(8);
   let P_touch = solve('down-touch', pair(D, foreF(D, LANDING_LIFT), flatS(S)), 0.6 * x(S), stepAnchor(S).z - 0.1, yInit, lowerLean, D, deg(10));
   {
@@ -171,7 +173,8 @@ function build(v: Values, rig: RigDefinition) {
     const b: ArmPose = { shoulder: [deg(-amount / 2), deg(8), 0], elbow: deg(10) };
     return (forward === 'left' ? { left: f, right: b } : { left: b, right: f }) as Record<Side, ArmPose>;
   };
-  const neutralArms = armsSwing('left', 0);
+  // Symmetric neutral arms (an armsSwing(...) with amount 0 would still differ in elbow flexion by side).
+  const neutralArms = armsBoth(0, deg(12));
   const key = (t: number, P: Vec3, lean: number, arms: Record<Side, ArmPose>, mode: BodyKey['mode'] = 'stop'): BodyKey => ({
     t,
     mode,
@@ -253,7 +256,7 @@ function build(v: Values, rig: RigDefinition) {
   feet[S].push(swing(tLiftS, tLandS, DOWN_SWING));
   feet[S].push({ kind: 'flat', start: tLandS, end: T, surface: 'floor', anchor: floorAnchor(S) });
 
-  const { pelvis, joints } = tracksFromKeys(keys);
+  const { pelvis, joints } = tracksFromKeys(keys, rig);
   const plan = basePlan({
     duration: T,
     phases: pb.phases,

@@ -31,7 +31,7 @@ export function directionFromOrbit(o: OrbitState, out = new THREE.Vector3()): TH
  * Smallest camera distance (along `dir`, from the box centre) that keeps all 8 corners of the box
  * inside a perspective frustum with vertical FOV `fovY` (rad) and `aspect`, with a margin.
  */
-export function fitDistance(bounds: Bounds3, dir: THREE.Vector3, fovY: number, aspect: number, margin = 1.08): { target: THREE.Vector3; distance: number } {
+export function fitDistance(bounds: Bounds3, dir: THREE.Vector3, fovY: number, aspect: number, margin = 1.04): { target: THREE.Vector3; distance: number } {
   const c = new THREE.Vector3(
     (bounds.min[0] + bounds.max[0]) / 2,
     (bounds.min[1] + bounds.max[1]) / 2,
