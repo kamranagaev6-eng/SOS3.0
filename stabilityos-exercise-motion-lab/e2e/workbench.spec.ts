@@ -64,6 +64,14 @@ async function waitRendered(page: Page): Promise<void> {
   await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
 }
 
+/** Real capture of the page with the stage in view (scrolled to the top unless told otherwise). */
+async function shot(page: Page, name: string, opts: { keepScroll?: boolean } = {}): Promise<void> {
+  if (!opts.keepScroll) await page.evaluate(() => window.scrollTo(0, 0));
+  await waitRendered(page);
+  await page.waitForTimeout(250);
+  await page.screenshot({ path: `${SHOTS}/${name}.png` });
+}
+
 test.describe('workbench', () => {
   test('loads with the persistent synthetic badge and a working WebGL stage', async ({ page }) => {
     const errors = trackConsole(page);
@@ -220,9 +228,7 @@ test.describe('workbench', () => {
       await page.getByRole('radio', { name: 'Oblique', exact: true }).check();
       await page.evaluate((t) => window.__motionLab!.seek(t), (showcase.start + showcase.end) / 2);
       await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
-      await waitRendered(page);
-      await page.waitForTimeout(300);
-      await page.screenshot({ path: `${SHOTS}/recipe-${r.id}.png` });
+      await shot(page, `recipe-${r.id}`);
 
       expect(errors).toEqual([]);
     });
@@ -247,8 +253,7 @@ test.describe('workbench', () => {
     const up = s.phases.find((p) => /up/i.test(p.id)) ?? s.phases[1]!;
     await page.evaluate((t) => window.__motionLab!.seek(t), (up.start + up.end) / 2);
     await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
-    await waitRendered(page);
-    await page.screenshot({ path: `${SHOTS}/step-up-right-lead.png` });
+    await shot(page, 'step-up-right-lead');
     expect(errors).toEqual([]);
   });
 
@@ -269,9 +274,7 @@ test.describe('workbench', () => {
       // Baseline must show the failure the engine replaces; the stabilized tier must not.
       await expect(page.getByTestId('within-baseline')).toHaveText('no');
       await expect(page.getByTestId('within-stabilized')).toHaveText('yes');
-      await waitRendered(page);
-      await page.waitForTimeout(300);
-      await page.screenshot({ path: `${SHOTS}/comparison-${id}.png` });
+      await shot(page, `comparison-${id}`);
       expect(errors).toEqual([]);
     });
   }
@@ -297,8 +300,9 @@ test.describe('workbench', () => {
     await focusNeutral(page);
     await page.keyboard.press('2');
     await expect.poll(async () => (await state(page)).view).toBe('side-left');
-    await waitRendered(page);
-    await page.screenshot({ path: `${SHOTS}/reduced-motion-static-inspection.png` });
+    await shot(page, 'reduced-motion-static-inspection');
+    await page.getByTestId('static-inspection').scrollIntoViewIfNeeded();
+    await shot(page, 'reduced-motion-static-inspection-keyposes', { keepScroll: true });
     expect(errors).toEqual([]);
   });
 
@@ -314,9 +318,9 @@ test.describe('workbench', () => {
     await expect(page.getByTestId('stage-canvas')).toBeVisible();
     const canvas = (await page.getByTestId('stage-canvas').boundingBox())!;
     expect(canvas.width).toBeLessThanOrEqual(390);
-    await page.screenshot({ path: `${SHOTS}/mobile-390x844.png` });
+    await shot(page, 'mobile-390x844');
     await page.getByTestId('stage-canvas').scrollIntoViewIfNeeded();
-    await page.screenshot({ path: `${SHOTS}/mobile-390x844-stage.png` });
+    await shot(page, 'mobile-390x844-stage', { keepScroll: true });
     // Comparison stacks vertically on a narrow stage.
     await page.getByTestId('comparison-toggle').check();
     await expect.poll(async () => (await state(page)).split).toBe('stacked');
@@ -340,10 +344,12 @@ test.describe('workbench', () => {
     await expect.poll(async () => (await state(page)).planOk, { timeout: 20_000 }).toBe(true);
     await page.getByTestId('overlay-hostBones').check();
     await page.evaluate(() => window.__motionLab!.seek(3));
+    await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
     await waitRendered(page);
     const sB = await state(page);
     expect(sB.stats!.points).toBeGreaterThan(0);
-    await page.screenshot({ path: `${SHOTS}/rig-b-host-bones.png` });
+    await expect(page.getByTestId('within-stabilized')).toHaveText('yes');
+    await shot(page, 'rig-b-host-bones');
 
     await rigSelect.selectOption({ label: rigC! });
     const blocker = page.getByTestId('rig-incompatible');
@@ -353,7 +359,7 @@ test.describe('workbench', () => {
     await expect(blocker.locator('.diag-hint').first()).toBeVisible();
     expect((await state(page)).planOk).toBe(false);
     await expect(page.getByTestId('play-toggle')).toBeDisabled();
-    await page.screenshot({ path: `${SHOTS}/rig-c-incompatible.png` });
+    await shot(page, 'rig-c-incompatible');
     expect(errors).toEqual([]);
   });
 
@@ -425,7 +431,7 @@ test.describe('workbench', () => {
     await expect(report).toHaveAttribute('data-within', 'true');
     await expect(report).toContainText('Round trip within tolerance');
     await report.scrollIntoViewIfNeeded();
-    await page.screenshot({ path: `${SHOTS}/export-roundtrip-verified.png` });
+    await shot(page, 'export-roundtrip-verified', { keepScroll: true });
     expect(errors).toEqual([]);
   });
 
@@ -478,7 +484,7 @@ test.describe('workbench', () => {
     await expect(page.getByTestId('diag-time')).toHaveText('3.200 s');
     await expect(page.getByTestId('contact-table')).toBeVisible();
     await expect(page.getByTestId('metrics-status')).toHaveText('Whole-clip metrics ready.', { timeout: 30_000 });
-    await page.screenshot({ path: `${SHOTS}/webgl-unavailable-state.png` });
+    await shot(page, 'webgl-unavailable-state');
   });
 
   test('compile failures and infeasible plans are shown with diagnostics, never as a silent motion', async ({ page }) => {
@@ -494,11 +500,11 @@ test.describe('workbench', () => {
       expect((await state(page)).planOk).toBe(false);
       await expect(page.getByTestId('play-toggle')).toBeDisabled();
     }
-    await page.screenshot({ path: `${SHOTS}/compile-error-state.png` });
-
-    await selectRecipe(page, 'step-up-down.v1');
-    await page.getByTestId('param-stepHeight').fill('0.22');
-    await expect(readable.first()).toBeVisible({ timeout: 10_000 });
+    await expect(readable.first()).toContainText(/UNSUPPORTED_CONFIGURATION|TARGET_UNREACHABLE|KEYPOSE_UNSOLVED|CONTACT/);
+    await shot(page, 'compile-error-state');
+    // Back to a valid value: the motion returns.
+    await page.getByTestId('param-depthKneeFlexionDeg').fill('70');
+    await expect.poll(async () => (await state(page)).planOk, { timeout: 10_000 }).toBe(true);
     expect(errors).toEqual([]);
   });
 });

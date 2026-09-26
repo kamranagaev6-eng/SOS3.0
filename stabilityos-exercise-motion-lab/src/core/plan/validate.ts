@@ -3,7 +3,7 @@ import { diag, type Diagnostic } from '../contracts/diagnostics.ts';
 import { planSchema, type FootState, type MotionPlan } from '../contracts/plan.ts';
 import type { RigDefinition } from '../contracts/rig.ts';
 import { findSurface, insideBounds, penetrationDepth, solids, validateEnvironment } from '../environment/surfaces.ts';
-import { footSites } from '../rig/canonical.ts';
+import { footSites, legJoints } from '../rig/canonical.ts';
 import { getRigModel, rigFingerprint } from '../rig/model.ts';
 import { contactPose, footGeom, footTargetAt, siteUnderTarget } from '../solver/footPose.ts';
 import { TOLERANCES } from '../tolerances.ts';
@@ -59,8 +59,31 @@ export function validatePlan(input: unknown, rig: RigDefinition): Diagnostic[] {
     if (e) out.push(diag('SCHEMA_INVALID', 'error', `${path}: ${e}`, { path }));
   }
   const model = getRigModel(rig);
-  for (const j of Object.keys(plan.joints))
-    if (!model.index.has(j)) out.push(diag('MISSING_BONE', 'error', `plan animates joint '${j}' missing from rig '${rig.id}'`, { path: `joints.${j}` }));
+  const solverOwned = new Set(['root', 'pelvis', ...SIDES.flatMap((sd) => Object.values(legJoints(sd)))]);
+  for (const [j, dofs] of Object.entries(plan.joints)) {
+    const idx = model.index.get(j);
+    if (idx === undefined) {
+      out.push(diag('MISSING_BONE', 'error', `plan animates joint '${j}' missing from rig '${rig.id}'`, { path: `joints.${j}` }));
+      continue;
+    }
+    if (solverOwned.has(j)) {
+      // Root/pelvis come from plan.pelvis; legs from IK. An authored track would override the solver
+      // and break contacts, so it is a contradiction, not an alternative input.
+      out.push(
+        diag('UNSUPPORTED_CONFIGURATION', 'error', `joint '${j}' is solver-owned (${j === 'root' || j === 'pelvis' ? 'driven by plan.pelvis' : 'solved by leg IK from contacts'}); authored joint tracks are not allowed`, {
+          path: `joints.${j}`,
+          hint: j === 'pelvis' || j === 'root' ? 'Author pelvis motion in plan.pelvis.' : 'Author foot states / contacts instead of leg joint angles.',
+        }),
+      );
+      continue;
+    }
+    const names = new Set(model.joints[idx]!.dofs.map((d) => d.name));
+    for (const d of Object.keys(dofs))
+      if (!names.has(d))
+        out.push(
+          diag('SCHEMA_INVALID', 'error', `joint '${j}' has no DOF '${d}' (has: ${[...names].join(', ')})`, { path: `joints.${j}.${d}` }),
+        );
+  }
 
   const b = plan.stabilization.bounds;
   if (b.some((v) => v < 0 || v > MAX_STABILIZATION_BOUND))
