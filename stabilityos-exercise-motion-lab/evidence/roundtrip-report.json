@@ -1,0 +1,430 @@
+{
+  "generatedAt": "2026-09-26T02:11:53.762Z",
+  "reviewStatus": "unreviewed-synthetic",
+  "reviewNotice": "UNREVIEWED SYNTHETIC ENGINEERING FIXTURE. Kinematic demonstration only: not a prescription, not a dose, not patient instruction, not validated for balance, loading, muscle activity, safety or clinical correctness. Exercise identity, approved instructions, dose, side and review authority must come from the host application.",
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux 6.18.44-fc-v37",
+    "arch": "x64",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "three": "r186",
+    "fileReader": "tests/support/fileReaderShim.ts (Node only)"
+  },
+  "tolerances": {
+    "exportPosition": 0.00005,
+    "exportRotation": 0.001,
+    "boneLengthRelExported": 0.00001,
+    "quatStepMax60fps": 0.17453292519943295
+  },
+  "summary": {
+    "recipePass": 8,
+    "recipeFail": 0,
+    "recipeBlocked": 0,
+    "recipeError": 0,
+    "controlPass": 3,
+    "controlFail": 0
+  },
+  "rows": [
+    {
+      "kind": "recipe",
+      "id": "sit-to-stand.v1",
+      "fps": 30,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 250,
+      "duration": 8.3,
+      "glbBytes": 177092,
+      "manifestBytes": 9570,
+      "sha256": "11c55fd73775b67b67b222340fb0cf7c961813d5bd564c8cdd188747498e2d04",
+      "maxPositionError": 1.3868821515803805e-7,
+      "maxRootError": 7.818276748228215e-8,
+      "maxRotationError": 3.239562270662702e-7,
+      "maxWorldRotationError": 2.871978543388516e-7,
+      "maxBoneLengthRelError": 7.769439110160226e-8,
+      "importedMinConsecutiveDot": 0.9993824763602017,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 4.027325339290947,
+        "maxStepAllowedDeg": 20,
+        "minConsecutiveDot": 0.9993824765211747,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.0011276752826769004,
+        "maxRotationError": 0.002402244246872804
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 116.45427000000001
+    },
+    {
+      "kind": "recipe",
+      "id": "sit-to-stand.v1",
+      "fps": 60,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 499,
+      "duration": 8.3,
+      "glbBytes": 279692,
+      "manifestBytes": 9534,
+      "sha256": "2bf3846a193845e785dd2a78e8a47cbfcd30114d80dfce7678c991b6a16a0158",
+      "maxPositionError": 1.38295555444299e-7,
+      "maxRootError": 7.960244652327475e-8,
+      "maxRotationError": 3.229106771973647e-7,
+      "maxWorldRotationError": 3.2046812579972265e-7,
+      "maxBoneLengthRelError": 5.259992105959753e-8,
+      "importedMinConsecutiveDot": 0.9998406715547329,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 2.0455952781555693,
+        "maxStepAllowedDeg": 10,
+        "minConsecutiveDot": 0.9998406718034425,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.0002816791365341474,
+        "maxRotationError": 0.0005979858810615279
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 97.14844600000004,
+      "sampleFiles": {
+        "glb": "evidence/exports/sit-to-stand.v1.glb",
+        "manifest": "evidence/exports/sit-to-stand.v1.manifest.json"
+      }
+    },
+    {
+      "kind": "recipe",
+      "id": "bilateral-squat.v1",
+      "fps": 30,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 349,
+      "duration": 11.6,
+      "glbBytes": 217912,
+      "manifestBytes": 9241,
+      "sha256": "f2d01bff7c05274befaff71e7156da1b261f97f48794afd116520b51ba76845c",
+      "maxPositionError": 1.3173235529510694e-7,
+      "maxRootError": 5.754323521844906e-8,
+      "maxRotationError": 4.0237208878690915e-7,
+      "maxWorldRotationError": 2.649170956501214e-7,
+      "maxBoneLengthRelError": 3.660198342631097e-8,
+      "importedMinConsecutiveDot": 0.9998473710256991,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 2.0021276668444488,
+        "maxStepAllowedDeg": 20,
+        "minConsecutiveDot": 0.9998473709383034,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.00029713177290122155,
+        "maxRotationError": 0.001430029024750267
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 78.52058599999998
+    },
+    {
+      "kind": "recipe",
+      "id": "bilateral-squat.v1",
+      "fps": 60,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 697,
+      "duration": 11.6,
+      "glbBytes": 361320,
+      "manifestBytes": 9211,
+      "sha256": "dec9ba0124472750453b590ffede50dec7e8a20852c67b4efb654f80c3d9df28",
+      "maxPositionError": 1.3768683794116753e-7,
+      "maxRootError": 5.9590772615025767e-8,
+      "maxRotationError": 4.619441776876384e-7,
+      "maxWorldRotationError": 2.6443878934707207e-7,
+      "maxBoneLengthRelError": 3.660198342631097e-8,
+      "importedMinConsecutiveDot": 0.9999618294288505,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 1.0012301504173287,
+        "maxStepAllowedDeg": 10,
+        "minConsecutiveDot": 0.99996182932643,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.0000836716127234107,
+        "maxRotationError": 0.0004018781218998037
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 128.03313000000003,
+      "sampleFiles": {
+        "glb": "evidence/exports/bilateral-squat.v1.glb",
+        "manifest": "evidence/exports/bilateral-squat.v1.manifest.json"
+      }
+    },
+    {
+      "kind": "recipe",
+      "id": "step-up-down.v1",
+      "fps": 30,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 325,
+      "duration": 10.8,
+      "glbBytes": 208044,
+      "manifestBytes": 14113,
+      "sha256": "9065d002963403742110d6e90491128fe1f33348e9268951a7621c93a09c4179",
+      "maxPositionError": 5.229290208360462e-7,
+      "maxRootError": 1.178989371987113e-7,
+      "maxRotationError": 0.000001857266271660147,
+      "maxWorldRotationError": 9.681335150536591e-7,
+      "maxBoneLengthRelError": 2.8983006305016453e-8,
+      "importedMinConsecutiveDot": 0.996232348137232,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 9.950374858654163,
+        "maxStepAllowedDeg": 20,
+        "minConsecutiveDot": 0.9962323484342831,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.006003572041779477,
+        "maxRotationError": 0.01550239097041843
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 70.98875899999996
+    },
+    {
+      "kind": "recipe",
+      "id": "step-up-down.v1",
+      "fps": 60,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 649,
+      "duration": 10.8,
+      "glbBytes": 341560,
+      "manifestBytes": 14097,
+      "sha256": "7515bb1687e1ab864828eae3de5876324d2e3f108bd81c1bad1c6e8f9ee1a254",
+      "maxPositionError": 5.194036927641916e-7,
+      "maxRootError": 1.7458922962801552e-7,
+      "maxRotationError": 0.0000019170064251695344,
+      "maxWorldRotationError": 9.93199327912614e-7,
+      "maxBoneLengthRelError": 2.862697301431183e-8,
+      "importedMinConsecutiveDot": 0.9990539977043016,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 4.984799249886551,
+        "maxStepAllowedDeg": 10,
+        "minConsecutiveDot": 0.9990539989721736,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.006042979966661635,
+        "maxRotationError": 0.01555267493942671
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 136.5248919999999,
+      "sampleFiles": {
+        "glb": "evidence/exports/step-up-down.v1.glb",
+        "manifest": "evidence/exports/step-up-down.v1.manifest.json"
+      }
+    },
+    {
+      "kind": "recipe",
+      "id": "bilateral-heel-raise.v1",
+      "fps": 30,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 331,
+      "duration": 11,
+      "glbBytes": 210172,
+      "manifestBytes": 10899,
+      "sha256": "134d95e853f0a641cc2536bfb8eb0c5aeac74eb77b14115a407226f4b0444691",
+      "maxPositionError": 3.807975326861271e-8,
+      "maxRootError": 9.404082103314781e-9,
+      "maxRotationError": 1.1777506989107963e-7,
+      "maxWorldRotationError": 1.1389671136439851e-7,
+      "maxBoneLengthRelError": 5.507376036698968e-10,
+      "importedMinConsecutiveDot": 0.9999792327392051,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 0.7385125972116869,
+        "maxStepAllowedDeg": 20,
+        "minConsecutiveDot": 0.9999792327466829,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.000030247840170720132,
+        "maxRotationError": 0.00019675522055470285
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 83.21660500000007
+    },
+    {
+      "kind": "recipe",
+      "id": "bilateral-heel-raise.v1",
+      "fps": 60,
+      "tier": "stabilized",
+      "status": "pass",
+      "frames": 661,
+      "duration": 11,
+      "glbBytes": 346160,
+      "manifestBytes": 10868,
+      "sha256": "562f13a666fffc9172bf2260ccd19f0e2e40dc5d3f61d59688e040214316e3b0",
+      "maxPositionError": 3.9792664740210337e-8,
+      "maxRootError": 9.406549650314844e-9,
+      "maxRotationError": 1.1751546175053924e-7,
+      "maxWorldRotationError": 1.1407382478433052e-7,
+      "maxBoneLengthRelError": 5.507376036698968e-10,
+      "importedMinConsecutiveDot": 0.9999948015226157,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 0.3694925757108605,
+        "maxStepAllowedDeg": 10,
+        "minConsecutiveDot": 0.9999948015268544,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "engine samplePose",
+        "maxPositionError": 0.000007681840956185891,
+        "maxRotationError": 0.000049908358469047615
+      },
+      "manifestValidationWithinTolerance": true,
+      "metricsAvailable": true,
+      "exportMs": 144.95126299999993,
+      "sampleFiles": {
+        "glb": "evidence/exports/bilateral-heel-raise.v1.glb",
+        "manifest": "evidence/exports/bilateral-heel-raise.v1.manifest.json"
+      }
+    },
+    {
+      "kind": "control",
+      "id": "synthetic seed 1",
+      "fps": 30,
+      "tier": "n/a (angles generated directly)",
+      "status": "pass",
+      "frames": 61,
+      "duration": 2,
+      "glbBytes": 99844,
+      "manifestBytes": 5022,
+      "sha256": "f673318dc8742e725fdb3faeebaa6dad675146672794ad0d7eac3635d0ef39f0",
+      "maxPositionError": 1.0466564847157172e-7,
+      "maxRootError": 2.3740007656983813e-8,
+      "maxRotationError": 1.55078142508308e-7,
+      "maxWorldRotationError": 2.2181682550031476e-7,
+      "maxBoneLengthRelError": 5.6878166806069906e-8,
+      "importedMinConsecutiveDot": 0.9991282231336015,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 4.785217575759951,
+        "maxStepAllowedDeg": 20,
+        "minConsecutiveDot": 0.9991282237861856,
+        "flipsApplied": 0
+      },
+      "midFrame": {
+        "available": true,
+        "source": "provided sampler",
+        "maxPositionError": 0.0006793363735886546,
+        "maxRotationError": 0.0010791440429328391
+      },
+      "manifestValidationWithinTolerance": false,
+      "metricsAvailable": false,
+      "exportMs": 14.159128999999893
+    },
+    {
+      "kind": "control",
+      "id": "synthetic seed 2 (heading wraps 180 deg)",
+      "fps": 60,
+      "tier": "n/a (angles generated directly)",
+      "status": "pass",
+      "frames": 121,
+      "duration": 2,
+      "glbBytes": 124632,
+      "manifestBytes": 5025,
+      "sha256": "8d92c9d5a188e0cf2d65cae6c89f8e1007c7853cee87eba840ea5cb62ee8ba49",
+      "maxPositionError": 1.6491011466772288e-7,
+      "maxRootError": 1.6158454713846023e-8,
+      "maxRotationError": 1.6368360946548932e-7,
+      "maxWorldRotationError": 3.1222576026561e-7,
+      "maxBoneLengthRelError": 5.2661010552235155e-8,
+      "importedMinConsecutiveDot": 0.9997363964002574,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 2.6311922484989654,
+        "maxStepAllowedDeg": 10,
+        "minConsecutiveDot": 0.9997363967083123,
+        "flipsApplied": 39
+      },
+      "midFrame": {
+        "available": true,
+        "source": "provided sampler",
+        "maxPositionError": 0.00028709234974588657,
+        "maxRotationError": 0.0002379537438053473
+      },
+      "manifestValidationWithinTolerance": false,
+      "metricsAvailable": false,
+      "exportMs": 22.033100999999988
+    },
+    {
+      "kind": "control",
+      "id": "synthetic seed 3 (heading wraps 180 deg)",
+      "fps": 24,
+      "tier": "n/a (angles generated directly)",
+      "status": "pass",
+      "frames": 49,
+      "duration": 2,
+      "glbBytes": 94900,
+      "manifestBytes": 5021,
+      "sha256": "d136bcd02b258d97a6e2c8d8b64abec3edec5a92434c605c87651ebe34255887",
+      "maxPositionError": 1.2846830013115541e-7,
+      "maxRootError": 1.0076690717743165e-8,
+      "maxRotationError": 1.522408633729078e-7,
+      "maxWorldRotationError": 2.8599902081615207e-7,
+      "maxBoneLengthRelError": 9.626576160147128e-8,
+      "importedMinConsecutiveDot": 0.9979202008394195,
+      "withinTolerance": true,
+      "issues": [],
+      "continuity": {
+        "maxStepDeg": 7.3918564420422594,
+        "maxStepAllowedDeg": 25,
+        "minConsecutiveDot": 0.9979202018020197,
+        "flipsApplied": 12
+      },
+      "midFrame": {
+        "available": true,
+        "source": "provided sampler",
+        "maxPositionError": 0.0012736123508908207,
+        "maxRotationError": 0.0022053319541446028
+      },
+      "manifestValidationWithinTolerance": false,
+      "metricsAvailable": false,
+      "exportMs": 10.664142999999967
+    }
+  ]
+}

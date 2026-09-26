@@ -29,8 +29,9 @@ export const DIAGNOSTIC_CODES = [
   'STABILIZATION_BOUND_REACHED',
   'SOLVER_NOT_CONVERGED',
   'KNEE_PLANE_DEGENERATE',
-  // export level
+  // export / clip-analysis level
   'EXPORT_MISMATCH',
+  'TOLERANCE_EXCEEDED',
 ] as const;
 
 export const diagnosticCodeSchema = z.enum(DIAGNOSTIC_CODES);

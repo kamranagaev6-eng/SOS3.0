@@ -110,6 +110,13 @@ export const stabilizationSchema = z.object({
   tolerance: positive,
   /** Knee flexion floor used as the reach constraint, avoiding the straight-knee singularity (rad). */
   kneeFlexionFloor: nonNegative,
+  /**
+   * Soft reach zone (rad of knee flexion above the floor). The authored knee "openness"
+   * q = 1 − cos κ (extended smoothly beyond full reach) is mapped C1 onto the floor inside this
+   * zone, so corrections ramp in instead of clipping (clipping kinks knee velocity near full
+   * extension, where knee angle is hypersensitive to hip–ankle distance).
+   */
+  reachSoftZone: nonNegative,
 });
 export type StabilizationSpec = z.infer<typeof stabilizationSchema>;
 

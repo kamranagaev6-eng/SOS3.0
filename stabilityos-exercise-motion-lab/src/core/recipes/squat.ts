@@ -38,8 +38,11 @@ const SPECS: readonly ParamSpec[] = [
   { key: 'standSeconds', label: 'Standing pause', kind: 'number', unit: 's', min: 0.5, max: 3, step: 0.1, default: 1, description: 'Pause standing before each cycle and at the end.' },
 ];
 
-/** Nominal standing knee flexion: keeps legs off the straight-knee singularity. */
-export const STANDING_KNEE = deg(5);
+/**
+ * Nominal standing knee flexion: keeps legs off the straight-knee singularity and outside the
+ * stabiliser's soft reach zone (floor 2° + zone 4° = 6°), so standing poses need no correction.
+ */
+export const STANDING_KNEE = deg(7);
 /** Required headroom below the rig's ankle dorsiflexion limit for the bottom pose. */
 const ANKLE_HEADROOM = deg(2);
 

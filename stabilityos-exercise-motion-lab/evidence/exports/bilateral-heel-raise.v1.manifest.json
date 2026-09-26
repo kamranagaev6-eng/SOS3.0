@@ -1,0 +1,401 @@
+{
+  "schema": "smx.export-manifest/1",
+  "reviewStatus": "unreviewed-synthetic",
+  "reviewNotice": "UNREVIEWED SYNTHETIC ENGINEERING FIXTURE. Kinematic demonstration only: not a prescription, not a dose, not patient instruction, not validated for balance, loading, muscle activity, safety or clinical correctness. Exercise identity, approved instructions, dose, side and review authority must come from the host application.",
+  "hostResponsibilities": [
+    "Exercise identity is supplied by the host by explicit recipe id; this package never infers it.",
+    "Approved patient-facing instructions, dose (sets, repetitions, load, frequency) and side come from the host.",
+    "Review and publication authority stay with the host clinical workflow; nothing here auto-publishes.",
+    "Numerical parameters in bundled fixtures are synthetic engineering values requiring clinical review."
+  ],
+  "recipe": {
+    "schema": "smx.recipe/1",
+    "recipeId": "bilateral-heel-raise.v1",
+    "reviewStatus": "unreviewed-synthetic",
+    "params": {
+      "heelRise": 0.06,
+      "lowerSeconds": 1.8,
+      "repetitions": 2,
+      "restSeconds": 1,
+      "riseSeconds": 1.2,
+      "stanceWidth": 0.2,
+      "toeOutDeg": 5,
+      "topHoldSeconds": 1
+    },
+    "provenance": {
+      "generator": "stabilityos-exercise-motion-lab",
+      "generatorVersion": "0.1.0",
+      "createdAt": "2026-09-26T02:11:53.562Z",
+      "note": "Exported with a baked animation."
+    }
+  },
+  "recipeTitle": "Bilateral heel raise (synthetic fixture)",
+  "recipeVersion": "1.0.0",
+  "setup": [
+    "Level floor only.",
+    "Feet placed symmetric about the midline at the stance width.",
+    "Start and end standing with feet flat."
+  ],
+  "phases": [
+    {
+      "id": "stand-start",
+      "label": "Stand",
+      "start": 0,
+      "end": 1
+    },
+    {
+      "id": "rise-1",
+      "label": "Rise 1",
+      "start": 1,
+      "end": 2.2
+    },
+    {
+      "id": "top-1",
+      "label": "Top 1",
+      "start": 2.2,
+      "end": 3.2
+    },
+    {
+      "id": "lower-1",
+      "label": "Lower 1",
+      "start": 3.2,
+      "end": 5
+    },
+    {
+      "id": "rest-1",
+      "label": "Rest 1",
+      "start": 5,
+      "end": 6
+    },
+    {
+      "id": "rise-2",
+      "label": "Rise 2",
+      "start": 6,
+      "end": 7.2
+    },
+    {
+      "id": "top-2",
+      "label": "Top 2",
+      "start": 7.2,
+      "end": 8.2
+    },
+    {
+      "id": "lower-2",
+      "label": "Lower 2",
+      "start": 8.2,
+      "end": 10
+    },
+    {
+      "id": "rest-2",
+      "label": "Rest 2",
+      "start": 10,
+      "end": 11
+    }
+  ],
+  "contactSchedule": [
+    {
+      "id": "ball_L@floor#0",
+      "site": "ball_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 11
+    },
+    {
+      "id": "ball_R@floor#0",
+      "site": "ball_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 11
+    },
+    {
+      "id": "foot_L.orientation@floor#0",
+      "site": "foot_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 0,
+      "end": 1
+    },
+    {
+      "id": "foot_R.orientation@floor#0",
+      "site": "foot_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 0,
+      "end": 1
+    },
+    {
+      "id": "heel_L@floor#0",
+      "site": "heel_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 1
+    },
+    {
+      "id": "heel_R@floor#0",
+      "site": "heel_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 1
+    },
+    {
+      "id": "toe_L@floor#0",
+      "site": "toe_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 11
+    },
+    {
+      "id": "toe_R@floor#0",
+      "site": "toe_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 11
+    },
+    {
+      "id": "toes_L.orientation@floor#0",
+      "site": "toes_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 1,
+      "end": 5
+    },
+    {
+      "id": "toes_R.orientation@floor#0",
+      "site": "toes_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 1,
+      "end": 5
+    },
+    {
+      "id": "foot_L.orientation@floor#1",
+      "site": "foot_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 5,
+      "end": 6
+    },
+    {
+      "id": "foot_R.orientation@floor#1",
+      "site": "foot_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 5,
+      "end": 6
+    },
+    {
+      "id": "heel_L@floor#1",
+      "site": "heel_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 5,
+      "end": 6
+    },
+    {
+      "id": "heel_R@floor#1",
+      "site": "heel_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 5,
+      "end": 6
+    },
+    {
+      "id": "toes_L.orientation@floor#1",
+      "site": "toes_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 6,
+      "end": 10
+    },
+    {
+      "id": "toes_R.orientation@floor#1",
+      "site": "toes_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 6,
+      "end": 10
+    },
+    {
+      "id": "foot_L.orientation@floor#2",
+      "site": "foot_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 10,
+      "end": 11
+    },
+    {
+      "id": "foot_R.orientation@floor#2",
+      "site": "foot_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 10,
+      "end": 11
+    },
+    {
+      "id": "heel_L@floor#2",
+      "site": "heel_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 10,
+      "end": 11
+    },
+    {
+      "id": "heel_R@floor#2",
+      "site": "heel_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 10,
+      "end": 11
+    }
+  ],
+  "cues": [
+    {
+      "id": "cue-stand-start",
+      "t": 0,
+      "phaseId": "stand-start",
+      "label": "Phase marker: start"
+    },
+    {
+      "id": "cue-rise-1",
+      "t": 1,
+      "phaseId": "rise-1",
+      "label": "Phase marker: rise 1"
+    },
+    {
+      "id": "cue-top-1",
+      "t": 2.2,
+      "phaseId": "top-1",
+      "label": "Phase marker: top 1"
+    },
+    {
+      "id": "cue-lower-1",
+      "t": 3.2,
+      "phaseId": "lower-1",
+      "label": "Phase marker: lower 1"
+    },
+    {
+      "id": "cue-rise-2",
+      "t": 6,
+      "phaseId": "rise-2",
+      "label": "Phase marker: rise 2"
+    },
+    {
+      "id": "cue-top-2",
+      "t": 7.2,
+      "phaseId": "top-2",
+      "label": "Phase marker: top 2"
+    },
+    {
+      "id": "cue-lower-2",
+      "t": 8.2,
+      "phaseId": "lower-2",
+      "label": "Phase marker: lower 2"
+    }
+  ],
+  "assumptions": [
+    "Synthetic engineering fixture requiring clinical review; not a prescription or instruction.",
+    "Heel lift follows the authored curve; the foot pivots about the MTP axis (ball/toes stay flat): φ = 17.6° at the top (left).",
+    "Pelvis keys solved for 5.0° mean knee flexion flat and at the top; pelvis moves forward with the ankles (24.0 mm).",
+    "Pelvis and heel-lift curves share key times and easing; the small nonlinearity is absorbed by knee flexion (reported per sample).",
+    "Kinematic demonstration only: no balance, calf loading or muscle model."
+  ],
+  "unsupported": [
+    "Single-leg heel raises.",
+    "Heel raises off a step edge (heels below the support surface).",
+    "Hand support or external load.",
+    "Bent-knee variant.",
+    "Heel rise heights whose MTP extension exceeds the rig limit minus 5°."
+  ],
+  "rig": {
+    "id": "synthetic-rig-a",
+    "name": "Synthetic rig A (canonical, 1.82 m)",
+    "fingerprint": "b1aeaf11b0f5fa72"
+  },
+  "convention": {
+    "handedness": "right",
+    "up": "+Y",
+    "forward": "+Z",
+    "subjectLeft": "+X",
+    "lengthUnit": "m",
+    "angleUnit": "rad",
+    "timeUnit": "s",
+    "quaternionOrder": "xyzw"
+  },
+  "bake": {
+    "fps": 60,
+    "frameCount": 661,
+    "duration": 11,
+    "solverTier": "stabilized",
+    "interpolation": "LINEAR"
+  },
+  "provenance": {
+    "generator": "stabilityos-exercise-motion-lab",
+    "generatorVersion": "0.1.0",
+    "createdAt": "2026-09-26T02:11:53.562Z",
+    "synthetic": true,
+    "assets": "All proportions, geometry, meshes and motion are original synthetic content generated by this package. No motion capture, patient data or third-party assets are included."
+  },
+  "validation": {
+    "kind": "geometric-only",
+    "statement": "Geometric checks only (contact residuals, planted-contact drift, surface penetration, bone lengths, joint limits, transition continuity and, when present, export round-trip fidelity). Passing them is NOT clinical validation: it says nothing about balance, tissue loading, muscle activity, safety or clinical correctness.",
+    "metrics": {
+      "sampleRate": 60,
+      "samples": 661,
+      "maxContactPositionError": 2.858641126058746e-15,
+      "maxPlantedDisplacement": 2.866661905371105e-15,
+      "maxContactOrientationError": 5.056621334738072e-15,
+      "maxPenetration": 9.228728892196614e-16,
+      "maxBoneLengthRelError": 9.251858538542972e-16,
+      "jointLimitViolations": 0,
+      "clampedSamples": 0,
+      "maxJointVelocityJump": 0.023608824478287826,
+      "maxLinearVelocityJump": 0.004128573691936534,
+      "maxStabilizationOffset": 0.0006961823480302564,
+      "stabilizedSamples": 661,
+      "nonConvergedSamples": 0,
+      "unreachableSamples": 0,
+      "kneeFlipSamples": 0,
+      "roundTrip.framesCompared": 661,
+      "roundTrip.maxPositionError": 3.9792664740210337e-8,
+      "roundTrip.maxRotationError": 1.1751546175053924e-7,
+      "roundTrip.maxBoneLengthRelError": 5.507376036698968e-10,
+      "roundTrip.maxRootError": 9.406549650314844e-9,
+      "tolerance.contactPosition": 0.001,
+      "tolerance.plantedDisplacement": 0.001,
+      "tolerance.contactOrientation": 0.017453292519943295,
+      "tolerance.penetration": 0.001,
+      "tolerance.boneLengthRel": 1e-9,
+      "tolerance.boneLengthRelExported": 0.00001,
+      "tolerance.jointLimit": 1e-9,
+      "tolerance.jointVelocityJump": 0.5,
+      "tolerance.linearVelocityJump": 0.1,
+      "tolerance.quatStepMax60fps": 0.17453292519943295,
+      "tolerance.exportPosition": 0.00005,
+      "tolerance.exportRotation": 0.001,
+      "tolerance.stabilizerResidual": 0.000001,
+      "tolerance.notableStabilization": 0.005,
+      "tolerance.continuityRate": 240
+    },
+    "withinTolerance": true,
+    "diagnostics": [
+      {
+        "code": "STABILIZATION_APPLIED",
+        "severity": "info",
+        "message": "pelvis corrected by 0.70 mm (465 samples; first at t=0.0000 s)",
+        "time": 0,
+        "subject": "pelvis",
+        "value": 0.0006961609605849168
+      }
+    ]
+  },
+  "files": {
+    "animation": "bilateral-heel-raise.v1.glb",
+    "animationSha256": "562f13a666fffc9172bf2260ccd19f0e2e40dc5d3f61d59688e040214316e3b0"
+  }
+}

@@ -16,29 +16,75 @@ export interface StabilizeInput {
   targets: Record<Side, FootTarget>;
   /** Seat contact weight: bounds shrink by (1 - w), so a seated pelvis cannot be moved. */
   seatWeight: number;
+  /** Reach-constraint weight per leg (1 in contact; fades to 0 inside a swing). */
+  swingWeight?: Record<'left' | 'right', number>;
   spec: StabilizationSpec;
 }
 
 /**
- * Constraint values g_j(Δ) (> 0 = violated), all in metres-equivalent, for each leg in contact:
- *   reach:   |A - H| - d(κ_floor)      (leg must keep ≥ κ_floor knee flexion; avoids the straight-knee singularity)
+ * Constraint values g_j(Δ) (> 0 = violated), all in metres-equivalent, for each constrained leg:
+ *   reach:   soft target on knee openness q = 1 − cos κ (see reachTargets), driven to equality
  *   fold:    d(κ_max) - |A - H|
  *   limits:  ANGULAR_LEVER · (θ - max) and ANGULAR_LEVER · (min - θ) for hip, knee and ankle DOFs
  */
-export function constraintValues(inp: StabilizeInput, delta: Vec3): number[] {
+/** C1 soft floor: identity above lo + zone, exponential approach to lo below it. */
+export function softFloor(x: number, lo: number, zone: number): number {
+  if (zone <= 0) return Math.max(x, lo);
+  const a = lo + zone;
+  return x >= a ? x : lo + zone * Math.exp((x - a) / zone);
+}
+
+/** Knee openness q = 1 − cos κ = (R² − d²)/(2 L1 L2); smooth in d, negative beyond full reach. */
+function openness(d: number, l1: number, l2: number): number {
+  const R = l1 + l2;
+  return (R * R - d * d) / (2 * l1 * l2);
+}
+
+interface ReachTarget {
+  q: number;
+  l1: number;
+  l2: number;
+}
+
+/**
+ * Per-leg soft reach targets from the authored (Δ = 0) pose. Contact legs: q_t = softFloor(q_raw).
+ * Swing legs: the floor is relaxed by (1 − w) where w fades 1 → 0 over the first and last 20 % of
+ * the swing, so a leg's constraint neither appears nor vanishes abruptly at lift-off or landing.
+ */
+function reachTargets(inp: StabilizeInput): Record<'left' | 'right', ReachTarget | null> {
+  const out: Record<'left' | 'right', ReachTarget | null> = { left: null, right: null };
+  const qFloor = 1 - Math.cos(inp.spec.kneeFlexionFloor);
+  const qZone = 1 - Math.cos(inp.spec.kneeFlexionFloor + inp.spec.reachSoftZone) - qFloor;
+  for (const side of ['left', 'right'] as const) {
+    const w = inp.swingWeight?.[side] ?? (inp.targets[side].mode === 'swing' ? 0 : 1);
+    if (w <= 0) continue;
+    const idx = inp.legs[side];
+    const sol = solveLegChain(inp.model, idx, inp.base, inp.pelvisRot, inp.targets[side]);
+    const l1 = -inp.model.offset[idx.knee]![1];
+    const l2 = -inp.model.offset[idx.ankle]![1];
+    const floor = qFloor - (1 - w) * 2;
+    out[side] = { q: softFloor(openness(sol.ik.distance, l1, l2), floor, qZone), l1, l2 };
+  }
+  return out;
+}
+
+export function constraintValues(inp: StabilizeInput, delta: Vec3, reach = reachTargets(inp)): number[] {
   const P = add(inp.base, delta);
   const out: number[] = [];
   for (const side of ['left', 'right'] as const) {
-    // Only legs whose foot is in contact constrain the pelvis: a swing foot target is not a
-    // contact, and its joint limits are handled by the swing soft limit instead.
-    if (inp.targets[side].mode === 'swing') continue;
+    const rt = reach[side];
+    if (!rt) continue;
     const idx = inp.legs[side];
     const sol = solveLegChain(inp.model, idx, P, inp.pelvisRot, inp.targets[side]);
-    const l1 = -inp.model.offset[idx.knee]![1];
-    const l2 = -inp.model.offset[idx.ankle]![1];
     const kneeDof = inp.model.joints[idx.knee]!.dofs[0]!;
-    out.push(sol.ik.distance - reachForKneeFlexion(l1, l2, inp.spec.kneeFlexionFloor));
-    out.push(reachForKneeFlexion(l1, l2, kneeDof.max) - sol.ik.distance);
+    // Soft reach, in metres-equivalent (dd/dq ≈ L1 L2 / R): driven to equality, never clipped.
+    out.push((rt.q - openness(sol.ik.distance, rt.l1, rt.l2)) * ((rt.l1 * rt.l2) / (rt.l1 + rt.l2)));
+    out.push(reachForKneeFlexion(rt.l1, rt.l2, kneeDof.max) - sol.ik.distance);
+    // Swing legs contribute reach only; their joint limits are handled by the swing soft limit.
+    if (inp.targets[side].mode === 'swing') {
+      out.push(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+      continue;
+    }
     for (const [jointIdx, angles] of [
       [idx.hip, sol.angles.hip],
       [idx.knee, [sol.ik.kneeFlexion]],
@@ -87,6 +133,8 @@ function solve3(A: number[][], b: number[]): Vec3 {
 }
 
 const MARGIN = 1e-5;
+/** Constraints per leg: [reach, fold, ...limit pairs]. Reach is driven to equality (no margin). */
+const isReach = (i: number, perLeg: number): boolean => i % perLeg === 0;
 
 /**
  * Bounded pelvis stabiliser (tier 2).
@@ -105,7 +153,12 @@ export function stabilizePelvis(inp: StabilizeInput): StabilizationReport {
     inp.spec.bounds[2] * (1 - inp.seatWeight),
   ];
   let delta: Vec3 = [0, 0, 0];
-  let g = constraintValues(inp, delta);
+  const reach = reachTargets(inp);
+  const cv = (d: Vec3) => constraintValues(inp, d, reach);
+  let g = cv(delta);
+  const legsConstrained = (['left', 'right'] as const).filter((s) => reach[s] !== null).length;
+  const perLeg = legsConstrained > 0 ? g.length / legsConstrained : 1;
+  const margin = (i: number) => (isReach(i, perLeg) ? 0 : MARGIN);
   const initialViolation = sumViolation(g);
   const tol = inp.spec.tolerance;
   if (maxViolation(g) <= tol) {
@@ -119,13 +172,14 @@ export function stabilizePelvis(inp: StabilizeInput): StabilizationReport {
     Math.max(-b[1], Math.min(b[1], d[1])),
     Math.max(-b[2], Math.min(b[2], d[2])),
   ];
+  // Iterate well past the acceptance tolerance so the converged offset is a smooth function of t.
   for (; iterations < inp.spec.maxIterations; iterations++) {
-    if (maxViolation(g) <= tol) break;
+    if (maxViolation(g) <= tol * 1e-3) break;
     const active: number[] = [];
     g.forEach((v, i) => {
-      if (v + MARGIN > 0) active.push(i);
+      if (v + margin(i) > 1e-15) active.push(i);
     });
-    const r = active.map((i) => g[i]! + MARGIN);
+    const r = active.map((i) => g[i]! + margin(i));
     // Central-difference Jacobian of active constraints (|active| x 3).
     const J: number[][] = active.map(() => [0, 0, 0]);
     for (let c = 0; c < 3; c++) {
@@ -133,8 +187,8 @@ export function stabilizePelvis(inp: StabilizeInput): StabilizationReport {
       const dm: Vec3 = [...delta];
       dp[c] = dp[c]! + h;
       dm[c] = dm[c]! - h;
-      const gp = constraintValues(inp, dp);
-      const gm = constraintValues(inp, dm);
+      const gp = cv(dp);
+      const gm = cv(dm);
       active.forEach((i, row) => {
         J[row]![c] = (gp[i]! - gm[i]!) / (2 * h);
       });
@@ -150,7 +204,7 @@ export function stabilizePelvis(inp: StabilizeInput): StabilizationReport {
     let scaleF = 1;
     for (let ls = 0; ls < 8; ls++) {
       const cand = clampBox([delta[0] + step[0] * scaleF, delta[1] + step[1] * scaleF, delta[2] + step[2] * scaleF]);
-      const gc = constraintValues(inp, cand);
+      const gc = cv(cand);
       if (sumViolation(gc) < before) {
         const moved = Math.hypot(cand[0] - delta[0], cand[1] - delta[1], cand[2] - delta[2]);
         delta = cand;

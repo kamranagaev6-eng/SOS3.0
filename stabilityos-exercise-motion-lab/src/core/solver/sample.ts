@@ -171,7 +171,7 @@ function sampleSolved(plan: MotionPlan, rig: RigDefinition, t: number, tier: 'an
   // 4. Optional bounded stabilisation (tier 2). Never modifies authored channels.
   let stab = DISABLED_STAB;
   if (tier === 'stabilized' && plan.stabilization.enabled) {
-    stab = stabilizePelvis({ model, legs: c.legs, base, pelvisRot, targets, seatWeight: ws, spec: plan.stabilization });
+    stab = stabilizePelvis({ model, legs: c.legs, base, pelvisRot, targets, seatWeight: ws, spec: plan.stabilization, swingWeight: swingReachWeights(plan, t) });
   }
   const P = add(base, stab.offset);
 
@@ -214,6 +214,18 @@ function sampleSolved(plan: MotionPlan, rig: RigDefinition, t: number, tier: 'an
   const rootTranslation: Vec3 = [P[0], 0, P[2]];
   const pelvisOffset: Vec3 = [0, P[1], 0];
   return finishSample(plan, c, t, tier, rootTranslation, pelvisOffset, local, angles, targets, stab, events, legReports);
+}
+
+/** Reach-constraint weight per leg: 1 in contact; inside a swing 1 at lift-off/landing, 0 in the middle 60 %. */
+function swingReachWeights(plan: MotionPlan, t: number): Record<Side, number> {
+  const w = { left: 1, right: 1 };
+  for (const side of SIDES) {
+    const st = plan.feet[side].find((s) => s.kind === 'swing' && t >= s.start && t <= s.end);
+    if (!st) continue;
+    const tau = (t - st.start) / (st.end - st.start);
+    w[side] = 1 - smootherstep(tau / 0.2) * smootherstep((1 - tau) / 0.2);
+  }
+  return w;
 }
 
 /** Width of the soft-limit zone for swing-foot ankle angles (rad). */

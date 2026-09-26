@@ -1,0 +1,496 @@
+{
+  "schema": "smx.export-manifest/1",
+  "reviewStatus": "unreviewed-synthetic",
+  "reviewNotice": "UNREVIEWED SYNTHETIC ENGINEERING FIXTURE. Kinematic demonstration only: not a prescription, not a dose, not patient instruction, not validated for balance, loading, muscle activity, safety or clinical correctness. Exercise identity, approved instructions, dose, side and review authority must come from the host application.",
+  "hostResponsibilities": [
+    "Exercise identity is supplied by the host by explicit recipe id; this package never infers it.",
+    "Approved patient-facing instructions, dose (sets, repetitions, load, frequency) and side come from the host.",
+    "Review and publication authority stay with the host clinical workflow; nothing here auto-publishes.",
+    "Numerical parameters in bundled fixtures are synthetic engineering values requiring clinical review."
+  ],
+  "recipe": {
+    "schema": "smx.recipe/1",
+    "recipeId": "step-up-down.v1",
+    "reviewStatus": "unreviewed-synthetic",
+    "params": {
+      "downLeadSide": "left",
+      "stanceWidth": 0.22,
+      "startDistance": 0.1,
+      "stepDepth": 0.36,
+      "stepHeight": 0.15,
+      "tempo": 1,
+      "upLeadSide": "left"
+    },
+    "provenance": {
+      "generator": "stabilityos-exercise-motion-lab",
+      "generatorVersion": "0.1.0",
+      "createdAt": "2026-09-26T02:11:53.160Z",
+      "note": "Exported with a baked animation."
+    }
+  },
+  "recipeTitle": "Step-up and controlled step-down (synthetic fixture)",
+  "recipeVersion": "1.0.0",
+  "setup": [
+    "Synthetic step box 0.8 m wide, riser at z = 0, tread extending toward +Z by the tread depth.",
+    "Start standing on the floor behind the step, toes at the toe-to-riser distance.",
+    "Both feet are placed fully on the tread (heel 5 cm onto it); end standing back at the start position."
+  ],
+  "phases": [
+    {
+      "id": "stand",
+      "label": "Stand",
+      "start": 0,
+      "end": 1
+    },
+    {
+      "id": "weight-shift",
+      "label": "Weight shift",
+      "start": 1,
+      "end": 1.6
+    },
+    {
+      "id": "lead-swing",
+      "label": "Lead swing (left)",
+      "start": 1.6,
+      "end": 2.5
+    },
+    {
+      "id": "rise",
+      "label": "Rise",
+      "start": 2.5,
+      "end": 3.8
+    },
+    {
+      "id": "trail-swing",
+      "label": "Trail swing (right)",
+      "start": 3.8,
+      "end": 4.8
+    },
+    {
+      "id": "top",
+      "label": "Stand on step",
+      "start": 4.8,
+      "end": 5.8
+    },
+    {
+      "id": "lower-shift",
+      "label": "Weight shift",
+      "start": 5.8,
+      "end": 6.4
+    },
+    {
+      "id": "lower",
+      "label": "Controlled lowering (left)",
+      "start": 6.4,
+      "end": 7.8
+    },
+    {
+      "id": "weight-accept",
+      "label": "Heel down",
+      "start": 7.8,
+      "end": 8.5
+    },
+    {
+      "id": "transfer-back",
+      "label": "Transfer back",
+      "start": 8.5,
+      "end": 9.1
+    },
+    {
+      "id": "trail-down",
+      "label": "Trail down (right)",
+      "start": 9.1,
+      "end": 10
+    },
+    {
+      "id": "stand-end",
+      "label": "Stand",
+      "start": 10,
+      "end": 10.8
+    }
+  ],
+  "contactSchedule": [
+    {
+      "id": "ball_L@floor#0",
+      "site": "ball_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 1.6
+    },
+    {
+      "id": "ball_R@floor#0",
+      "site": "ball_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 3.8
+    },
+    {
+      "id": "foot_L.orientation@floor#0",
+      "site": "foot_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 0,
+      "end": 1.6
+    },
+    {
+      "id": "foot_R.orientation@floor#0",
+      "site": "foot_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 0,
+      "end": 2.695
+    },
+    {
+      "id": "heel_L@floor#0",
+      "site": "heel_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 1.6
+    },
+    {
+      "id": "heel_R@floor#0",
+      "site": "heel_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 2.695
+    },
+    {
+      "id": "toe_L@floor#0",
+      "site": "toe_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 1.6
+    },
+    {
+      "id": "toe_R@floor#0",
+      "site": "toe_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 0,
+      "end": 3.8
+    },
+    {
+      "id": "ball_L@step.top#0",
+      "site": "ball_L",
+      "surface": "step.top",
+      "kind": "position",
+      "start": 2.5,
+      "end": 6.4
+    },
+    {
+      "id": "foot_L.orientation@step.top#0",
+      "site": "foot_L",
+      "surface": "step.top",
+      "kind": "orientation",
+      "start": 2.5,
+      "end": 6.4
+    },
+    {
+      "id": "heel_L@step.top#0",
+      "site": "heel_L",
+      "surface": "step.top",
+      "kind": "position",
+      "start": 2.5,
+      "end": 6.4
+    },
+    {
+      "id": "toe_L@step.top#0",
+      "site": "toe_L",
+      "surface": "step.top",
+      "kind": "position",
+      "start": 2.5,
+      "end": 6.4
+    },
+    {
+      "id": "toes_R.orientation@floor#0",
+      "site": "toes_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 2.695,
+      "end": 3.8
+    },
+    {
+      "id": "ball_R@step.top#0",
+      "site": "ball_R",
+      "surface": "step.top",
+      "kind": "position",
+      "start": 4.8,
+      "end": 9.1
+    },
+    {
+      "id": "foot_R.orientation@step.top#0",
+      "site": "foot_R",
+      "surface": "step.top",
+      "kind": "orientation",
+      "start": 4.8,
+      "end": 9.1
+    },
+    {
+      "id": "heel_R@step.top#0",
+      "site": "heel_R",
+      "surface": "step.top",
+      "kind": "position",
+      "start": 4.8,
+      "end": 9.1
+    },
+    {
+      "id": "toe_R@step.top#0",
+      "site": "toe_R",
+      "surface": "step.top",
+      "kind": "position",
+      "start": 4.8,
+      "end": 9.1
+    },
+    {
+      "id": "ball_L@floor#1",
+      "site": "ball_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 7.8,
+      "end": 10.8
+    },
+    {
+      "id": "toe_L@floor#1",
+      "site": "toe_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 7.8,
+      "end": 10.8
+    },
+    {
+      "id": "toes_L.orientation@floor#0",
+      "site": "toes_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 7.8,
+      "end": 8.5
+    },
+    {
+      "id": "foot_L.orientation@floor#1",
+      "site": "foot_L",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 8.5,
+      "end": 10.8
+    },
+    {
+      "id": "heel_L@floor#1",
+      "site": "heel_L",
+      "surface": "floor",
+      "kind": "position",
+      "start": 8.5,
+      "end": 10.8
+    },
+    {
+      "id": "ball_R@floor#1",
+      "site": "ball_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 10,
+      "end": 10.8
+    },
+    {
+      "id": "foot_R.orientation@floor#1",
+      "site": "foot_R",
+      "surface": "floor",
+      "kind": "orientation",
+      "start": 10,
+      "end": 10.8
+    },
+    {
+      "id": "heel_R@floor#1",
+      "site": "heel_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 10,
+      "end": 10.8
+    },
+    {
+      "id": "toe_R@floor#1",
+      "site": "toe_R",
+      "surface": "floor",
+      "kind": "position",
+      "start": 10,
+      "end": 10.8
+    }
+  ],
+  "cues": [
+    {
+      "id": "cue-stand",
+      "t": 0,
+      "phaseId": "stand",
+      "label": "Phase marker: start"
+    },
+    {
+      "id": "cue-lead-swing",
+      "t": 1.6,
+      "phaseId": "lead-swing",
+      "label": "Phase marker: left foot up"
+    },
+    {
+      "id": "cue-rise",
+      "t": 2.5,
+      "phaseId": "rise",
+      "label": "Phase marker: rise"
+    },
+    {
+      "id": "cue-trail-swing",
+      "t": 3.8,
+      "phaseId": "trail-swing",
+      "label": "Phase marker: right foot up"
+    },
+    {
+      "id": "cue-top",
+      "t": 4.8,
+      "phaseId": "top",
+      "label": "Phase marker: on step"
+    },
+    {
+      "id": "cue-lower",
+      "t": 6.4,
+      "phaseId": "lower",
+      "label": "Phase marker: left foot down"
+    },
+    {
+      "id": "cue-trail-down",
+      "t": 9.1,
+      "phaseId": "trail-down",
+      "label": "Phase marker: right foot down"
+    }
+  ],
+  "assumptions": [
+    "Synthetic engineering fixture requiring clinical review; not a prescription or instruction.",
+    "Up-leading side left; down-leading side left (explicit parameters, never inferred).",
+    "Feet on the tread: heel 0.05 m onto the tread from the nosing; start with toes 0.1 m from the riser.",
+    "Trailing heel lifts to 0.07 m before toe-off; the lowering foot lands toes first with the heel 0.045 m up, then lowers.",
+    "Key poses: toe-off solved for 8° trailing knee flexion; step-down touch solved for 10° knee flexion of the lowering leg; standing keys for 5.0°.",
+    "Swing paths lift first, then travel, then settle (C2 windows); clearance is checked against the step geometry at compile time.",
+    "Arm swing is a small authored counter-swing, not a gait model. Kinematic only: no balance, load or muscle model."
+  ],
+  "unsupported": [
+    "Step heights outside 0.08–0.22 m, or heights this rig cannot lower from with the stance foot flat.",
+    "Treads too shallow for full-foot support; stepping onto the nosing.",
+    "Lateral or crossover step-ups, step-throughs, stairs with multiple steps, continuous alternating repetitions.",
+    "Hand rails, hand support, walking aids.",
+    "Toe-out on this recipe (feet point straight ahead)."
+  ],
+  "rig": {
+    "id": "synthetic-rig-a",
+    "name": "Synthetic rig A (canonical, 1.82 m)",
+    "fingerprint": "b1aeaf11b0f5fa72"
+  },
+  "convention": {
+    "handedness": "right",
+    "up": "+Y",
+    "forward": "+Z",
+    "subjectLeft": "+X",
+    "lengthUnit": "m",
+    "angleUnit": "rad",
+    "timeUnit": "s",
+    "quaternionOrder": "xyzw"
+  },
+  "bake": {
+    "fps": 60,
+    "frameCount": 649,
+    "duration": 10.8,
+    "solverTier": "stabilized",
+    "interpolation": "LINEAR"
+  },
+  "provenance": {
+    "generator": "stabilityos-exercise-motion-lab",
+    "generatorVersion": "0.1.0",
+    "createdAt": "2026-09-26T02:11:53.160Z",
+    "synthetic": true,
+    "assets": "All proportions, geometry, meshes and motion are original synthetic content generated by this package. No motion capture, patient data or third-party assets are included."
+  },
+  "validation": {
+    "kind": "geometric-only",
+    "statement": "Geometric checks only (contact residuals, planted-contact drift, surface penetration, bone lengths, joint limits, transition continuity and, when present, export round-trip fidelity). Passing them is NOT clinical validation: it says nothing about balance, tissue loading, muscle activity, safety or clinical correctness.",
+    "metrics": {
+      "sampleRate": 60,
+      "samples": 649,
+      "maxContactPositionError": 3.0410093413148523e-15,
+      "maxPlantedDisplacement": 4.980255449677776e-15,
+      "maxContactOrientationError": 5.482516720936913e-15,
+      "maxPenetration": 1.2004286453759505e-15,
+      "maxBoneLengthRelError": 1.3877787807814457e-15,
+      "jointLimitViolations": 0,
+      "clampedSamples": 0,
+      "maxJointVelocityJump": 2.271052671350704,
+      "maxLinearVelocityJump": 0.7204172337826388,
+      "maxStabilizationOffset": 0.011751494884838459,
+      "stabilizedSamples": 412,
+      "nonConvergedSamples": 0,
+      "unreachableSamples": 0,
+      "kneeFlipSamples": 0,
+      "diagnostics.STABILIZATION_APPLIED": 30,
+      "roundTrip.framesCompared": 649,
+      "roundTrip.maxPositionError": 5.194036927641916e-7,
+      "roundTrip.maxRotationError": 0.0000019170064251695344,
+      "roundTrip.maxBoneLengthRelError": 2.862697301431183e-8,
+      "roundTrip.maxRootError": 1.7458922962801552e-7,
+      "tolerance.contactPosition": 0.001,
+      "tolerance.plantedDisplacement": 0.001,
+      "tolerance.contactOrientation": 0.017453292519943295,
+      "tolerance.penetration": 0.001,
+      "tolerance.boneLengthRel": 1e-9,
+      "tolerance.boneLengthRelExported": 0.00001,
+      "tolerance.jointLimit": 1e-9,
+      "tolerance.jointVelocityJump": 0.5,
+      "tolerance.linearVelocityJump": 0.1,
+      "tolerance.quatStepMax60fps": 0.17453292519943295,
+      "tolerance.exportPosition": 0.00005,
+      "tolerance.exportRotation": 0.001,
+      "tolerance.stabilizerResidual": 0.000001,
+      "tolerance.notableStabilization": 0.005,
+      "tolerance.continuityRate": 240
+    },
+    "withinTolerance": true,
+    "diagnostics": [
+      {
+        "code": "STABILIZATION_APPLIED",
+        "severity": "warning",
+        "message": "pelvis corrected by 5.4 mm (notable: authored trajectory disagrees with rig geometry) (30 samples; first at t=1.1833 s)",
+        "time": 1.1833333333333333,
+        "subject": "pelvis",
+        "value": 0.005357000716680994,
+        "limit": 0.005
+      },
+      {
+        "code": "STABILIZATION_APPLIED",
+        "severity": "info",
+        "message": "pelvis corrected by 0.70 mm (270 samples; first at t=0.0000 s)",
+        "time": 0,
+        "subject": "pelvis",
+        "value": 0.0006962992459425417
+      },
+      {
+        "code": "JOINT_LIMIT_CLAMPED",
+        "severity": "info",
+        "message": "swing ankle_L.dorsiflexion softened from 27.5° to 27.5° (swing foot orientation is a preference, not a contact) (61 samples; first at t=1.8000 s)",
+        "time": 1.8,
+        "subject": "ankle_L.dorsiflexion~swing",
+        "value": 0.47993882059976645,
+        "limit": 0.4796733233450861
+      },
+      {
+        "code": "JOINT_LIMIT_CLAMPED",
+        "severity": "info",
+        "message": "swing ankle_R.dorsiflexion softened from 28.7° to 28.6° (swing foot orientation is a preference, not a contact) (49 samples; first at t=4.0667 s)",
+        "time": 4.066666666666666,
+        "subject": "ankle_R.dorsiflexion~swing",
+        "value": 0.5015762090595461,
+        "limit": 0.49850671370269095
+      }
+    ]
+  },
+  "files": {
+    "animation": "step-up-down.v1.glb",
+    "animationSha256": "7515bb1687e1ab864828eae3de5876324d2e3f108bd81c1bad1c6e8f9ee1a254"
+  }
+}

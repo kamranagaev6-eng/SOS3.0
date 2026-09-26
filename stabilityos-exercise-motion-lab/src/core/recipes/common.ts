@@ -148,7 +148,7 @@ export function floorEnvironment(extra: Environment['objects'] = []): Environmen
 }
 
 export function standardStabilization(): StabilizationSpec {
-  return { enabled: true, bounds: [0.02, 0.03, 0.02], notableOffset: 0.005, maxIterations: 30, tolerance: 1e-6, kneeFlexionFloor: deg(2) };
+  return { enabled: true, bounds: [0.02, 0.03, 0.02], notableOffset: 0.005, maxIterations: 30, tolerance: 1e-6, kneeFlexionFloor: deg(2), reachSoftZone: deg(4) };
 }
 
 /** Sequential phase builder. */
