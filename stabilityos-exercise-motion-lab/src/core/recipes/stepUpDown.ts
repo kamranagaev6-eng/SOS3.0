@@ -42,7 +42,7 @@ const STEP_WIDTH = 0.8;
 const HEEL_MARGIN = 0.05;
 const TOE_OFF_LIFT = 0.07;
 const LANDING_LIFT = 0.045;
-/** Leading-ankle dorsiflexion cap at trailing toe-off (authoring choice, below the rig limit). */
+/** Stance-ankle dorsiflexion cap at toe-off and at step-down touch (authoring choice, below the rig limit). */
 const TOE_OFF_MAX_DORSI = deg(26);
 /** Forward pelvis travel during the lead swing (m). */
 const LEAD_SWING_TRAVEL = 0.1;
@@ -140,7 +140,27 @@ function build(v: Values, rig: RigDefinition) {
   const P_top = solve('stand-step', stepBoth, 0, zStep + 0.02, yInit + H, 0, 'min', STANDING_KNEE);
   const P_lowShift = solve('lower-shift', stepBoth, 0.5 * x(S), zStep + 0.02, yInit + H, 0, D, STANDING_KNEE);
   const lowerLean = deg(8);
-  const P_touch = solve('down-touch', pair(D, foreF(D, LANDING_LIFT), flatS(S)), 0.6 * x(S), stepAnchor(S).z - 0.1, yInit, lowerLean, D, deg(10));
+  let P_touch = solve('down-touch', pair(D, foreF(D, LANDING_LIFT), flatS(S)), 0.6 * x(S), stepAnchor(S).z - 0.1, yInit, lowerLean, D, deg(10));
+  {
+    // Same compile-time rule as toe-off: if the stance ankle on the step would exceed the cap while
+    // the lowering foot reaches the floor, move the pelvis back and down so it needs exactly the cap.
+    const touchTargets = pair(D, foreF(D, LANDING_LIFT), flatS(S));
+    const legsAt = evaluateLegs(rig, P_touch, rot(lowerLean), touchTargets);
+    if (legsAt[S].angles.ankle[0]! > TOE_OFF_MAX_DORSI) {
+      const r = solveKeyPose(rig, rot(lowerLean), touchTargets, P_touch, [1, 2], [
+        { quantity: 'kneeFlexion', side: D, target: deg(10) },
+        { quantity: 'ankleDorsiflexion', side: S, target: TOE_OFF_MAX_DORSI },
+      ]);
+      if (!r.ok || !r.reachable)
+        diagnostics.push(
+          diag('UNSUPPORTED_CONFIGURATION', 'error', `controlled lowering needs more than ${fmtDeg(TOE_OFF_MAX_DORSI)} ${S} ankle dorsiflexion on the step for the ${D} foot to reach the floor`, {
+            path: 'params.stepHeight',
+            hint: 'Lower the step or reduce the toe-to-riser distance for this rig.',
+          }),
+        );
+      else P_touch = r.P;
+    }
+  }
   const P_accept = solve('weight-accept', pair(D, flatF(D), flatS(S)), 0.2 * x(S), (stepAnchor(S).z + floorAnchor(D).z) / 2, yInit, deg(4), D, deg(15));
   const P_transfer = solve('transfer-back', pair(D, flatF(D), flatS(S)), 0.5 * x(D), floorAnchor(D).z + 0.05, yInit, 0, D, STANDING_KNEE);
   const P_end = solve('stand-floor-end', floorBoth, 0, zFloor + 0.02, yInit, 0, 'min', STANDING_KNEE);
