@@ -1,0 +1,371 @@
+{
+ "generatedAt": "2026-09-26T03:36:13.971Z",
+ "env": {
+  "node": "v24.21.0",
+  "v8": "13.6.233.17-node.53",
+  "platform": "linux 6.18.44-fc-v37",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "logicalCores": 4,
+  "totalMemGB": 16.9,
+  "gcExposed": true,
+  "note": "Shared cloud container; single-threaded measurements; timings include JIT warm-up of 200 calls per tier."
+ },
+ "results": [
+  {
+   "recipe": "sit-to-stand.v1",
+   "duration": 8.3,
+   "compileMs": {
+    "n": 15,
+    "min": 71.05080599999997,
+    "p50": 83.00136999999995,
+    "p95": 117.89530000000002,
+    "p99": 117.89530000000002,
+    "max": 225.312346,
+    "mean": 95.46522606666666
+   },
+   "perTier": {
+    "analytic": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 18.44400000004498,
+      "p50": 20.81399999997302,
+      "p95": 30.236000000058993,
+      "p99": 56.235000000015134,
+      "max": 366.16300000014235,
+      "mean": 23.388956333333553
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "stabilized": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 19.557000000077096,
+      "p50": 21.574999999984357,
+      "p95": 30.830000000150903,
+      "p99": 57.84700000003795,
+      "max": 310.8110000000579,
+      "mean": 24.03138699999865
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "baseline": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 27.102000000013504,
+      "p50": 34.55700000017714,
+      "p95": 58.925999999928536,
+      "p99": 105.72499999989304,
+      "max": 399.8500000000149,
+      "mean": 38.94314199999942
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    }
+   },
+   "bake60fps": {
+    "frames": 499,
+    "ms": 19.338321999999835,
+    "heapGrowthMB": 20.550584
+   },
+   "analyze240Hz": {
+    "samples": 1993,
+    "ms": 125.01015300000017,
+    "heapGrowthMBAfterReturn": 19.490448,
+    "withinTolerance": true
+   }
+  },
+  {
+   "recipe": "bilateral-squat.v1",
+   "duration": 11.6,
+   "compileMs": {
+    "n": 15,
+    "min": 111.48954600000025,
+    "p50": 117.31090200000017,
+    "p95": 123.80480100000023,
+    "p99": 123.80480100000023,
+    "max": 130.45656999999983,
+    "mean": 117.21533339999993
+   },
+   "perTier": {
+    "analytic": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 19.34399999981906,
+      "p50": 22.986999999830005,
+      "p95": 39.36500000008891,
+      "p99": 59.18599999995422,
+      "max": 335.0980000000163,
+      "mean": 26.10504433333383
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "stabilized": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 20.92399999992267,
+      "p50": 24.26100000002407,
+      "p95": 37.15999999985797,
+      "p99": 59.755999999651976,
+      "max": 424.4320000002517,
+      "mean": 27.26946966666502
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "baseline": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 29.12000000014814,
+      "p50": 35.61999999965337,
+      "p95": 59.1669999998885,
+      "p99": 85.43499999996129,
+      "max": 852.3239999994985,
+      "mean": 40.362866333334836
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    }
+   },
+   "bake60fps": {
+    "frames": 697,
+    "ms": 26.33770700000059,
+    "heapGrowthMB": 11.12892
+   },
+   "analyze240Hz": {
+    "samples": 2785,
+    "ms": 145.12058099999922,
+    "heapGrowthMBAfterReturn": 25.257432,
+    "withinTolerance": true
+   }
+  },
+  {
+   "recipe": "step-up-down.v1",
+   "duration": 10.8,
+   "compileMs": {
+    "n": 15,
+    "min": 130.47264499999983,
+    "p50": 138.68310199999996,
+    "p95": 169.1592609999998,
+    "p99": 169.1592609999998,
+    "max": 199.0504490000003,
+    "mean": 145.6331063333335
+   },
+   "perTier": {
+    "analytic": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 22.83999999963271,
+      "p50": 27.09899999990739,
+      "p95": 40.87100000015198,
+      "p99": 60.98500000007334,
+      "max": 616.6870000006384,
+      "mean": 29.815082666675774
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "stabilized": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 23.549000000457454,
+      "p50": 28.260000000045693,
+      "p95": 69.55199999993056,
+      "p99": 180.09900000015477,
+      "max": 583.3809999994628,
+      "mean": 36.76963833332592
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 2,
+      "max": 2,
+      "mean": 0.085
+     },
+     "samplesWithIterations": 134
+    },
+    "baseline": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 32.956999999441905,
+      "p50": 41.13800000050105,
+      "p95": 100.62999999991007,
+      "p99": 207.91100000042206,
+      "max": 606.9779999997991,
+      "mean": 51.11486933333905
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    }
+   },
+   "bake60fps": {
+    "frames": 649,
+    "ms": 27.895766999999978,
+    "heapGrowthMB": 15.121928
+   },
+   "analyze240Hz": {
+    "samples": 2593,
+    "ms": 163.21493099999952,
+    "heapGrowthMBAfterReturn": 20.441,
+    "withinTolerance": true
+   }
+  },
+  {
+   "recipe": "bilateral-heel-raise.v1",
+   "duration": 11,
+   "compileMs": {
+    "n": 15,
+    "min": 111.30535400000008,
+    "p50": 113.77966199999992,
+    "p95": 143.67453099999966,
+    "p99": 143.67453099999966,
+    "max": 165.62255200000072,
+    "mean": 119.99043173333345
+   },
+   "perTier": {
+    "analytic": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 21.796000000904314,
+      "p50": 25.485999998636544,
+      "p95": 44.69699999935983,
+      "p99": 67.01299999986077,
+      "max": 1964.588000000731,
+      "mean": 29.71826099999574
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "stabilized": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 23.234999998749117,
+      "p50": 26.70399999988149,
+      "p95": 40.84800000055111,
+      "p99": 63.597000000299886,
+      "max": 420.94100000031176,
+      "mean": 29.737050666674502
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    },
+    "baseline": {
+     "microsecondsPerSample": {
+      "n": 3000,
+      "min": 31.97799999907147,
+      "p50": 42.110000000320724,
+      "p95": 83.32599999994272,
+      "p99": 117.52599999999802,
+      "max": 2057.281999999759,
+      "mean": 52.814583666699704
+     },
+     "stabilizerIterations": {
+      "n": 3000,
+      "min": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0,
+      "max": 0,
+      "mean": 0
+     },
+     "samplesWithIterations": 0
+    }
+   },
+   "bake60fps": {
+    "frames": 661,
+    "ms": 19.312934999999925,
+    "heapGrowthMB": 64.570752
+   },
+   "analyze240Hz": {
+    "samples": 2641,
+    "ms": 140.60412899999938,
+    "heapGrowthMBAfterReturn": 38.51884,
+    "withinTolerance": true
+   }
+  }
+ ]
+}
