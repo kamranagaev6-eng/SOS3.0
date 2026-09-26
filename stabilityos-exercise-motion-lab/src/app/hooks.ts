@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useMediaQuery(query: string): boolean {
   const get = (): boolean => (typeof window !== 'undefined' && window.matchMedia ? window.matchMedia(query).matches : false);
@@ -12,13 +12,6 @@ export function useMediaQuery(query: string): boolean {
     return () => mq.removeEventListener('change', on);
   }, [query]);
   return matches;
-}
-
-/** Ref that always holds the latest value (for stable event handlers). */
-export function useLatest<T>(value: T): { readonly current: T } {
-  const ref = useRef(value);
-  ref.current = value;
-  return ref;
 }
 
 export function downloadBlob(data: BlobPart, fileName: string, type: string): void {

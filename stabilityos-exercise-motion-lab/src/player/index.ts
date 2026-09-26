@@ -1,6 +1,5 @@
 export {
   createPlayer,
-  formatTime,
   phaseIndexAt,
   SPEEDS,
   DEFAULT_INSPECTION_RATE,

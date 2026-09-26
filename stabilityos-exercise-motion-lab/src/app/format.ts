@@ -45,9 +45,3 @@ export function unitWord(spec: ParamSpec): string {
       return 'ratio';
   }
 }
-
-export function sci(v: number | null | undefined): string {
-  if (v === null || v === undefined || !Number.isFinite(v)) return '—';
-  if (v === 0) return '0';
-  return Math.abs(v) < 1e-3 ? v.toExponential(1) : v.toFixed(4);
-}
