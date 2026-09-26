@@ -12,6 +12,9 @@ import { armJoints, SEAT_SITE } from '../rig/canonical.ts';
 import { composeJointRotation, getRigModel, rigFingerprint } from '../rig/model.ts';
 import { validateRig } from '../rig/validate.ts';
 import { samplePose } from '../solver/sample.ts';
+import { ClipAnalyzer } from '../metrics/analyze.ts';
+import { bakeTimes } from '../metrics/bake.ts';
+import { TOLERANCES } from '../tolerances.ts';
 import type { CompileResult, RecipeDefinition } from './types.ts';
 
 export type Values = Record<string, number | string>;
@@ -232,15 +235,20 @@ export function compileWith(
 }
 
 /**
- * Samples the plan at 30 Hz (plus the end) with the stabilised solver and summarises per-sample
- * errors into one diagnostic per (code, subject) with the time range and worst value.
+ * Compile-time feasibility: samples the plan at the metric rate (240 Hz, same times as
+ * `analyzePlan`) with the stabilised solver, (a) summarising per-sample errors into one diagnostic
+ * per (code, subject) with time range and worst value, and (b) feeding the same samples through the
+ * independent ClipAnalyzer (incl. two-rate continuity refinement). `feasible` is true only if both
+ * are clean, so a feasible plan is within every clip tolerance by construction.
  */
-export function feasibilityScan(plan: MotionPlan, rig: RigDefinition, rate = 30): Diagnostic[] {
-  const n = Math.ceil(plan.duration * rate);
+export function feasibilityScan(plan: MotionPlan, rig: RigDefinition, rate: number = TOLERANCES.continuityRate): Diagnostic[] {
+  const times = bakeTimes(plan.duration, rate);
+  const n = times.length;
+  const analyzer = new ClipAnalyzer(plan, rig, 'stabilized', rate);
   const groups = new Map<string, { d: Diagnostic; first: number; last: number; count: number; worst: number }>();
-  for (let k = 0; k <= n; k++) {
-    const t = Math.min(plan.duration, k / rate);
+  for (const t of times) {
     const s = samplePose(plan, rig, t, 'stabilized');
+    analyzer.push(s);
     for (const d of s.diagnostics) {
       if (d.severity !== 'error') continue;
       const key = `${d.code}|${d.subject ?? ''}`;
@@ -257,8 +265,10 @@ export function feasibilityScan(plan: MotionPlan, rig: RigDefinition, rate = 30)
       }
     }
   }
-  return [...groups.values()].map((g) =>
-    diag(g.d.code, 'error', `${g.d.message} (worst; ${g.count} of ${n + 1} scan samples, t=${g.first.toFixed(2)}–${g.last.toFixed(2)} s)`, {
+  analyzer.refine((t) => samplePose(plan, rig, t, 'stabilized'));
+  const metrics = analyzer.finish();
+  const out = [...groups.values()].map((g) =>
+    diag(g.d.code, 'error', `${g.d.message} (worst; ${g.count} of ${n} scan samples at ${rate} Hz, t=${g.first.toFixed(3)}–${g.last.toFixed(3)} s)`, {
       subject: g.d.subject,
       time: g.d.time,
       value: g.worst,
@@ -266,6 +276,11 @@ export function feasibilityScan(plan: MotionPlan, rig: RigDefinition, rate = 30)
       hint: g.d.hint ?? 'The authored motion is not kinematically feasible for this rig and parameters.',
     }),
   );
+  // Clip-level failures (e.g. continuity) that no per-sample diagnostic represents.
+  if (!metrics.withinTolerance && out.length === 0)
+    for (const f of metrics.failures)
+      out.push(diag('TOLERANCE_EXCEEDED', 'error', `clip analysis: ${f}`, { hint: 'See the metrics panel / analyzePlan for details.' }));
+  return out;
 }
 
 export function basePlan(args: {

@@ -54,7 +54,7 @@ function swing(start: number, end: number, s: Omit<SwingState, 'kind' | 'start' 
 
 const UP_SWING = { clearance: 0.05, horizontalDelay: 0.25, horizontalLead: 0, riseEnd: 0.5, descendStart: 0.62 };
 const TRAIL_UP_SWING = { clearance: 0.06, horizontalDelay: 0.22, horizontalLead: 0, riseEnd: 0.48, descendStart: 0.62 };
-const DOWN_SWING = { clearance: 0.045, horizontalDelay: 0.05, horizontalLead: 0.3, riseEnd: 0.2, descendStart: 0.6 };
+const DOWN_SWING = { clearance: 0.06, horizontalDelay: 0.05, horizontalLead: 0.3, riseEnd: 0.2, descendStart: 0.62 };
 
 function build(v: Values, rig: RigDefinition) {
   const diagnostics: Diagnostic[] = [];
