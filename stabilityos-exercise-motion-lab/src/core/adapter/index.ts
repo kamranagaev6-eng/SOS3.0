@@ -17,8 +17,8 @@ import { diag, hasErrors, type Diagnostic } from '../contracts/diagnostics.ts';
 import type { BoneMap, CapabilityReport, HostSkeleton } from '../contracts/hostRig.ts';
 import { rigSchema, type Capability, type RigDefinition } from '../contracts/rig.ts';
 import { formatZodIssues } from '../contracts/common.ts';
-import type { Quat } from '../math/quat.ts';
-import type { Vec3 } from '../math/vec3.ts';
+import { quatRotateVec3, type Quat } from '../math/quat.ts';
+import { add, type Vec3 } from '../math/vec3.ts';
 import { buildCanonicalRig } from '../rig/canonical.ts';
 import type { PoseSample } from '../solver/types.ts';
 import { createHostBasis, type AxisConvention } from './basis.ts';
@@ -101,7 +101,14 @@ function create(hostIn: unknown, boneMapIn: unknown, requiredIn: unknown, option
   if (!basisR.ok) diagnostics.push(diag('RIG_INVALID', 'error', `host skeleton '${host.id}': ${basisR.message}`, { path: 'host.up', hint: basisR.hint }));
   const { topology: topo, diagnostics: topoDiags } = buildTopology(host);
   diagnostics.push(...topoDiags);
-  const mapping = validateMapping(host, boneMap, topo, diagnostics);
+  const mappingDiags: Diagnostic[] = [];
+  const mapping = validateMapping(host, boneMap, topo, mappingDiags);
+  // Left/right geometry is checked whenever the rest pose is computable: a swapped mapping is
+  // usually the root cause of the hierarchy/site mismatches, so it is reported first.
+  const topologyOk = basisR.ok && !hasErrors(topoDiags);
+  const rest = topologyOk ? canonicalRest(host, topo, basisR.basis) : null;
+  if (rest) checkSides(host, topo, mapping.jointBone, rest.worldP, diagnostics);
+  diagnostics.push(...mappingDiags);
 
   // Capability assessment needs only hierarchy + bone map.
   const capabilities = assessCapabilities(host, boneMap);
@@ -115,32 +122,16 @@ function create(hostIn: unknown, boneMapIn: unknown, requiredIn: unknown, option
         'MISSING_CAPABILITY',
         isRequired ? 'error' : 'warning',
         `host skeleton '${host.id}' lacks capability '${r.capability}': ${r.reason}` + (isRequired ? '' : ' (not required by the requested motion; affected motion is reported as unrepresented)'),
-        { subject: r.capability, hint: capabilityHint(host, boneMap, r.capability, options.requiredBy?.[r.capability]) },
+        { subject: r.capability, hint: capabilityHint(host, boneMap, r.capability, options.requiredBy?.[r.capability], isRequired) },
       ),
     );
   }
-  if (!basisR.ok || hasErrors(diagnostics)) return { ok: false, diagnostics: [...diagnostics, ...capabilityDiags.filter((d) => d.severity === 'error')] };
+  if (!basisR.ok || !rest || hasErrors(diagnostics)) return { ok: false, diagnostics: [...diagnostics, ...capabilityDiags.filter((d) => d.severity === 'error')] };
   const basis = basisR.basis;
-
-  const rest = canonicalRest(host, topo, basis);
-  checkSides(host, topo, mapping.jointBone, rest.worldP, diagnostics);
-  if (hasErrors(diagnostics)) return { ok: false, diagnostics: [...diagnostics, ...capabilityDiags.filter((d) => d.severity === 'error')] };
 
   const sitePos = new Map<string, Vec3>();
   for (const [s, d] of mapping.siteDefs) {
-    const off = basis.vecToCanonical(d.offset);
-    const p = rest.worldP[d.bone]!;
-    const r = rest.worldR[d.bone]!;
-    // world = P + R · offset
-    const [qx, qy, qz, qw] = r;
-    const tx = 2 * (qy * off[2] - qz * off[1]);
-    const ty = 2 * (qz * off[0] - qx * off[2]);
-    const tz = 2 * (qx * off[1] - qy * off[0]);
-    sitePos.set(s, [
-      p[0] + off[0] + qw * tx + (qy * tz - qz * ty),
-      p[1] + off[1] + qw * ty + (qz * tx - qx * tz),
-      p[2] + off[2] + qw * tz + (qx * ty - qy * tx),
-    ]);
+    sitePos.set(s, add(rest.worldP[d.bone]!, quatRotateVec3(rest.worldR[d.bone]!, basis.vecToCanonical(d.offset))));
   }
   const measureInput: MeasureInput = {
     hostId: host.id,

@@ -69,10 +69,10 @@ function build(v: Values, rig: RigDefinition) {
   const L = rig.proportions.left.leg;
   const init = L.ankleHeight + 0.93 * (L.thigh + L.shank);
   const rot0 = pelvisRotation(rig, 0, 0, 0);
-  const stand = solveKeyPose(rig, rot0, flat, [0, init, 0.02], [1], [{ quantity: 'kneeFlexion', side: 'mean', target: STANDING_KNEE }]);
+  const stand = solveKeyPose(rig, rot0, flat, [0, init, 0.02], [1], [{ quantity: 'kneeFlexion', side: 'min', target: STANDING_KNEE }]);
   // At the top the pelvis follows the ankles forward so the legs keep their standing inclination.
   const dz = (top.left.anklePos[2] - flat.left.anklePos[2] + top.right.anklePos[2] - flat.right.anklePos[2]) / 2;
-  const up = solveKeyPose(rig, rot0, top, [0, init + h, 0.02 + dz], [1], [{ quantity: 'kneeFlexion', side: 'mean', target: STANDING_KNEE }]);
+  const up = solveKeyPose(rig, rot0, top, [0, init + h, 0.02 + dz], [1], [{ quantity: 'kneeFlexion', side: 'min', target: STANDING_KNEE }]);
   for (const [name, r] of [['standing', stand], ['top', up]] as const)
     if (!r.ok || !r.reachable) diagnostics.push(diag('KEYPOSE_UNSOLVED', 'error', `could not solve the ${name} key pose`));
   if (diagnostics.length) return { plan: null, diagnostics };

@@ -97,7 +97,7 @@ function build(v: Values, rig: RigDefinition) {
 
   const init = L.ankleHeight + 0.93 * (L.thigh + L.shank);
   const standZ = anchors.left.z + 0.02;
-  const stand = solveKeyPose(rig, pelvisRotation(rig, 0, 0, 0), targets, [0, init, standZ], [1], [{ quantity: 'kneeFlexion', side: 'mean', target: STANDING_KNEE }]);
+  const stand = solveKeyPose(rig, pelvisRotation(rig, 0, 0, 0), targets, [0, init, standZ], [1], [{ quantity: 'kneeFlexion', side: 'min', target: STANDING_KNEE }]);
   const midRiseLean = 0.75 * maxLean;
   const midRise = solveKeyPose(rig, pelvisRotation(rig, 0, trunkLean(midRiseLean).tilt, 0), targets, [0, lerp(seatOff[1], init, 0.5), lerp(seatOff[2], standZ, 0.75)], [1], [
     { quantity: 'kneeFlexion', side: 'mean', target: MID_KNEE },

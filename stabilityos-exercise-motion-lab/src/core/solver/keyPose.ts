@@ -16,17 +16,19 @@ import type { FootTarget } from './types.ts';
 export type LegQuantity = 'kneeFlexion' | 'ankleDorsiflexion' | 'hipFlexion';
 export interface KeyPoseGoal {
   quantity: LegQuantity;
-  side: Side | 'mean';
+  /** 'min' targets the smaller value of the two legs (e.g. the straighter knee of an asymmetric rig). */
+  side: Side | 'mean' | 'min';
   target: number;
 }
 
-function quantity(sol: Record<Side, LegChainSolution>, q: LegQuantity, side: Side | 'mean'): number {
+function quantity(sol: Record<Side, LegChainSolution>, q: LegQuantity, side: Side | 'mean' | 'min'): number {
   const one = (s: Side): number => {
     const l = sol[s];
     if (q === 'kneeFlexion') return l.ik.kneeFlexion;
     if (q === 'ankleDorsiflexion') return l.angles.ankle[0]!;
     return l.angles.hip[0]!;
   };
+  if (side === 'min') return Math.min(one('left'), one('right'));
   return side === 'mean' ? (one('left') + one('right')) / 2 : one(side);
 }
 

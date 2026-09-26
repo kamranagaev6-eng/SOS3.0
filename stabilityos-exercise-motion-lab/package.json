@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "bench:solver": "node bench/solver-bench.ts",
+    "bench:solver": "node --expose-gc bench/solver-bench.ts",
     "bench:render": "playwright test e2e/render-bench.spec.ts --project=bench",
     "report:metrics": "node scripts/metrics-report.ts",
     "report:roundtrip": "node scripts/roundtrip-report.ts",

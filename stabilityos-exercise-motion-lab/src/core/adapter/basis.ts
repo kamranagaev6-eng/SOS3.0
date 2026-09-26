@@ -118,12 +118,13 @@ export function createHostBasis(conv: AxisConvention): BasisResult {
   }
   const s = METRES_PER_UNIT[conv.units];
   const matrix: Mat3 = [l[0], l[1], l[2], u[0], u[1], u[2], f[0], f[1], f[2]];
-  const toC = (v: readonly number[]): Vec3 => [L.sign * (v[L.axis] ?? 0), U.sign * (v[U.axis] ?? 0), F.sign * (v[F.axis] ?? 0)];
+  // `+ 0` turns −0 into +0 so sign flips of zero components never leak into output data.
+  const toC = (v: readonly number[]): Vec3 => [L.sign * (v[L.axis] ?? 0) + 0, U.sign * (v[U.axis] ?? 0) + 0, F.sign * (v[F.axis] ?? 0) + 0];
   const toH = (v: readonly number[]): Vec3 => {
     const out: Vec3 = [0, 0, 0];
-    out[L.axis] = L.sign * (v[0] ?? 0);
-    out[U.axis] = U.sign * (v[1] ?? 0);
-    out[F.axis] = F.sign * (v[2] ?? 0);
+    out[L.axis] = L.sign * (v[0] ?? 0) + 0;
+    out[U.axis] = U.sign * (v[1] ?? 0) + 0;
+    out[F.axis] = F.sign * (v[2] ?? 0) + 0;
     return out;
   };
   const basis: HostBasis = {

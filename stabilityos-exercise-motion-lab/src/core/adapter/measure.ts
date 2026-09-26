@@ -201,12 +201,15 @@ export function measureHost(input: MeasureInput, diagnostics: Diagnostic[]): Mea
       fail(lj.knee, `${side} thigh or shank has zero length in the host rest pose ('${boneName(lj.hip)}' → '${boneName(lj.knee)}' → '${boneName(lj.ankle)}')`, 'Hip, knee and ankle bones must have distinct rest origins.');
       continue;
     }
-    if (K[1] >= H[1] || K2[1] >= K[1])
+    if (K[1] >= H[1] || K2[1] >= K[1]) {
+      const d = normalize(sub(K2, H));
       fail(
         lj.knee,
-        `${side} leg does not point down in canonical space (hip y=${H[1].toFixed(3)} m, knee y=${K[1].toFixed(3)} m, ankle y=${K2[1].toFixed(3)} m)`,
-        'Check the skeleton\'s `up` axis label, and that the host rest pose is standing (legs below the hips).',
+        `${side} leg does not point down after converting to canonical axes: hip → ankle direction is ` +
+          `[${d.map((x) => x.toFixed(2)).join(', ')}] (canonical +Y is up; expected about [0, -1, 0])`,
+        "Check the skeleton's `up`/`forward`/`left` axis labels against the data, and that the host rest pose is standing (legs below the hips).",
       );
+    }
     leg[side] = { thigh, shank };
     align.set(lj.hip, alignDir(lj.hip, sub(K, H), DOWN));
     align.set(lj.knee, alignDir(lj.knee, sub(K2, K), DOWN));
@@ -240,7 +243,10 @@ export function measureHost(input: MeasureInput, diagnostics: Diagnostic[]): Mea
   align.set('pelvis', pelvisAlign);
   const Ph = pos('pelvis')!;
   const anchorHeight = trunkAnchor ? dot(sub(trunkAnchor, mid), yh) : Infinity;
-  const hipDrop = Math.min(Math.max(0, dot(sub(Ph, mid), yh)), 0.5 * anchorHeight);
+  // The canonical pelvis origin lies on the hip-midline axis, at or above the hip centres and
+  // below the first trunk joint (lumbarBaseHeight > 0); the host bone's offset from it is kept
+  // exactly as pelvisDelta.
+  const hipDrop = Math.max(0, Math.min(dot(sub(Ph, mid), yh), anchorHeight - 1e-3));
   const Pc = add(mid, scale(yh, hipDrop));
   const pelvisDelta = quatRotateVec3(pelvisAlign, sub(Ph, Pc));
   jointRestPos.set('pelvis', Pc);

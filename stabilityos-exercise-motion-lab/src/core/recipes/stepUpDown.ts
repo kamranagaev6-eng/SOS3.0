@@ -6,7 +6,7 @@ import type { RigDefinition } from '../contracts/rig.ts';
 import { deg } from '../math/curves.ts';
 import type { Vec3 } from '../math/vec3.ts';
 import { flatPose, footGeom, forefootPose } from '../solver/footPose.ts';
-import { solveKeyPose } from '../solver/keyPose.ts';
+import { evaluateLegs, solveKeyPose } from '../solver/keyPose.ts';
 import type { FootTarget } from '../solver/types.ts';
 import {
   basePlan,
@@ -42,6 +42,8 @@ const STEP_WIDTH = 0.8;
 const HEEL_MARGIN = 0.05;
 const TOE_OFF_LIFT = 0.07;
 const LANDING_LIFT = 0.045;
+/** Leading-ankle dorsiflexion cap at trailing toe-off (authoring choice, below the rig limit). */
+const TOE_OFF_MAX_DORSI = deg(26);
 /** Forward pelvis travel during the lead swing (m). */
 const LEAD_SWING_TRAVEL = 0.1;
 
@@ -51,7 +53,7 @@ function swing(start: number, end: number, s: Omit<SwingState, 'kind' | 'start' 
 
 const UP_SWING = { clearance: 0.05, horizontalDelay: 0.25, horizontalLead: 0, riseEnd: 0.5, descendStart: 0.62 };
 const TRAIL_UP_SWING = { clearance: 0.06, horizontalDelay: 0.22, horizontalLead: 0, riseEnd: 0.48, descendStart: 0.62 };
-const DOWN_SWING = { clearance: 0.03, horizontalDelay: 0.05, horizontalLead: 0.25, riseEnd: 0.2, descendStart: 0.56 };
+const DOWN_SWING = { clearance: 0.045, horizontalDelay: 0.05, horizontalLead: 0.3, riseEnd: 0.2, descendStart: 0.6 };
 
 function build(v: Values, rig: RigDefinition) {
   const diagnostics: Diagnostic[] = [];
@@ -93,7 +95,7 @@ function build(v: Values, rig: RigDefinition) {
   const Lr = legs.left.leg;
   const yInit = Lr.ankleHeight + 0.93 * (Lr.thigh + Lr.shank);
   const rot = (lean: number) => pelvisRotation(rig, 0, trunkLean(lean).tilt, 0);
-  const solve = (name: string, targets: Record<Side, FootTarget>, px: number, pz: number, y0: number, lean: number, side: Side | 'mean', knee: number): Vec3 => {
+  const solve = (name: string, targets: Record<Side, FootTarget>, px: number, pz: number, y0: number, lean: number, side: Side | 'mean' | 'min', knee: number): Vec3 => {
     const r = solveKeyPose(rig, rot(lean), targets, [px, y0, pz], [1], [{ quantity: 'kneeFlexion', side, target: knee }]);
     if (!r.ok || !r.reachable)
       diagnostics.push(
@@ -108,20 +110,40 @@ function build(v: Values, rig: RigDefinition) {
   const floorBoth = { left: flatF('left'), right: flatF('right') };
   const stepBoth = { left: flatS('left'), right: flatS('right') };
 
-  const P_stand = solve('stand-floor', floorBoth, 0, zFloor + 0.02, yInit, 0, 'mean', STANDING_KNEE);
+  const P_stand = solve('stand-floor', floorBoth, 0, zFloor + 0.02, yInit, 0, 'min', STANDING_KNEE);
   const P_shift = solve('weight-shift', floorBoth, 0.5 * x(B), zFloor + 0.02, yInit, 0, A, STANDING_KNEE);
   // During the lead swing the pelvis travels forward over the trailing foot's forefoot so the
   // leading shank is not steeply inclined when the foot lands on the step.
   const P_leadLand = solve('lead-landing', pair(A, flatS(A), flatF(B)), 0.35 * x(B), zFloor + 0.02 + LEAD_SWING_TRAVEL, yInit, deg(4), B, deg(8));
   const riseLean = deg(10);
-  const P_toeOff = solve('toe-off', pair(A, flatS(A), foreF(B, TOE_OFF_LIFT)), 0.6 * x(A), stepAnchor(A).z - 0.08, yInit + H * 0.5, riseLean, B, deg(8));
-  const P_top = solve('stand-step', stepBoth, 0, zStep + 0.02, yInit + H, 0, 'mean', STANDING_KNEE);
+  let P_toeOff = solve('toe-off', pair(A, flatS(A), foreF(B, TOE_OFF_LIFT)), 0.6 * x(A), stepAnchor(A).z - 0.08, yInit + H * 0.5, riseLean, B, deg(8));
+  {
+    // If the leading ankle would need more than TOE_OFF_MAX_DORSI with the default pelvis placement,
+    // move the pelvis back and down (solve y, z) so it needs exactly that — explicit, at compile time.
+    const toeOffTargets = pair(A, flatS(A), foreF(B, TOE_OFF_LIFT));
+    const legsAt = evaluateLegs(rig, P_toeOff, rot(riseLean), toeOffTargets);
+    if (legsAt[A].angles.ankle[0]! > TOE_OFF_MAX_DORSI) {
+      const r = solveKeyPose(rig, rot(riseLean), toeOffTargets, P_toeOff, [1, 2], [
+        { quantity: 'kneeFlexion', side: B, target: deg(8) },
+        { quantity: 'ankleDorsiflexion', side: A, target: TOE_OFF_MAX_DORSI },
+      ]);
+      if (!r.ok || !r.reachable)
+        diagnostics.push(
+          diag('UNSUPPORTED_CONFIGURATION', 'error', `toe-off pose needs more than ${fmtDeg(TOE_OFF_MAX_DORSI)} ${A} ankle dorsiflexion while the ${B} forefoot is still on the floor`, {
+            path: 'params.stepHeight',
+            hint: 'Lower the step or reduce the toe-to-riser distance for this rig.',
+          }),
+        );
+      else P_toeOff = r.P;
+    }
+  }
+  const P_top = solve('stand-step', stepBoth, 0, zStep + 0.02, yInit + H, 0, 'min', STANDING_KNEE);
   const P_lowShift = solve('lower-shift', stepBoth, 0.5 * x(S), zStep + 0.02, yInit + H, 0, D, STANDING_KNEE);
   const lowerLean = deg(8);
   const P_touch = solve('down-touch', pair(D, foreF(D, LANDING_LIFT), flatS(S)), 0.6 * x(S), stepAnchor(S).z - 0.1, yInit, lowerLean, D, deg(10));
   const P_accept = solve('weight-accept', pair(D, flatF(D), flatS(S)), 0.2 * x(S), (stepAnchor(S).z + floorAnchor(D).z) / 2, yInit, deg(4), D, deg(15));
   const P_transfer = solve('transfer-back', pair(D, flatF(D), flatS(S)), 0.5 * x(D), floorAnchor(D).z + 0.05, yInit, 0, D, STANDING_KNEE);
-  const P_end = solve('stand-floor-end', floorBoth, 0, zFloor + 0.02, yInit, 0, 'mean', STANDING_KNEE);
+  const P_end = solve('stand-floor-end', floorBoth, 0, zFloor + 0.02, yInit, 0, 'min', STANDING_KNEE);
   if (diagnostics.length) return { plan: null, diagnostics };
 
   const armsSwing = (forward: Side, amount: number): Record<Side, ArmPose> => {

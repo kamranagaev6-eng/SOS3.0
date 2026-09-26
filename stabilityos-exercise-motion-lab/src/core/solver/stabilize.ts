@@ -25,7 +25,7 @@ export interface StabilizeInput {
  * Constraint values g_j(Δ) (> 0 = violated), all in metres-equivalent, for each constrained leg:
  *   reach:   soft target on knee openness q = 1 − cos κ (see reachTargets), driven to equality
  *   fold:    d(κ_max) - |A - H|
- *   limits:  ANGULAR_LEVER · (θ - max) and ANGULAR_LEVER · (min - θ) for hip, knee and ankle DOFs
+ *   limits:  ANGULAR_LEVER · (θ - max) and ANGULAR_LEVER · (min - θ) for hip and ankle DOFs
  */
 /** C1 soft floor: identity above lo + zone, exponential approach to lo below it. */
 export function softFloor(x: number, lo: number, zone: number): number {
@@ -81,13 +81,14 @@ export function constraintValues(inp: StabilizeInput, delta: Vec3, reach = reach
     out.push((rt.q - openness(sol.ik.distance, rt.l1, rt.l2)) * ((rt.l1 * rt.l2) / (rt.l1 + rt.l2)));
     out.push(reachForKneeFlexion(rt.l1, rt.l2, kneeDof.max) - sol.ik.distance);
     // Swing legs contribute reach only; their joint limits are handled by the swing soft limit.
+    // Knee limits are not listed: reach (soft floor) and fold rows already bound knee flexion, and
+    // the κ ≥ 0 row would be non-differentiable exactly at full extension.
     if (inp.targets[side].mode === 'swing') {
-      out.push(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+      out.push(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
       continue;
     }
     for (const [jointIdx, angles] of [
       [idx.hip, sol.angles.hip],
-      [idx.knee, [sol.ik.kneeFlexion]],
       [idx.ankle, sol.angles.ankle],
     ] as const) {
       const j = inp.model.joints[jointIdx]!;
@@ -198,21 +199,27 @@ export function stabilizePelvis(inp: StabilizeInput): StabilizationReport {
     const mu = 1e-9 * Math.max(trace, 1e-12);
     for (let a = 0; a < 3; a++) JtJ[a]![a]! += mu;
     const Jtr = [0, 1, 2].map((a) => J.reduce((s, row, k) => s + row[a]! * r[k]!, 0));
-    const step = solve3(JtJ, Jtr).map((v) => -v) as Vec3;
+    const gnStep = solve3(JtJ, Jtr).map((v) => -v) as Vec3;
+    // Fallback direction: steepest descent of ½|r|², scaled to the GN step length.
+    const gnLen = Math.hypot(...gnStep);
+    const gradLen = Math.hypot(...Jtr);
+    const sdStep = (gradLen > 0 ? Jtr.map((v) => (-v / gradLen) * Math.max(gnLen, 1e-4)) : [0, 0, 0]) as Vec3;
     const before = sumViolation(g);
     let accepted = false;
-    let scaleF = 1;
-    for (let ls = 0; ls < 8; ls++) {
-      const cand = clampBox([delta[0] + step[0] * scaleF, delta[1] + step[1] * scaleF, delta[2] + step[2] * scaleF]);
-      const gc = cv(cand);
-      if (sumViolation(gc) < before) {
-        const moved = Math.hypot(cand[0] - delta[0], cand[1] - delta[1], cand[2] - delta[2]);
-        delta = cand;
-        g = gc;
-        accepted = moved > 0;
-        break;
+    for (const step of [gnStep, sdStep]) {
+      let scaleF = 1;
+      for (let ls = 0; ls < 12 && !accepted; ls++) {
+        const cand = clampBox([delta[0] + step[0] * scaleF, delta[1] + step[1] * scaleF, delta[2] + step[2] * scaleF]);
+        const gc = cv(cand);
+        if (sumViolation(gc) < before) {
+          const moved = Math.hypot(cand[0] - delta[0], cand[1] - delta[1], cand[2] - delta[2]);
+          delta = cand;
+          g = gc;
+          accepted = moved > 0;
+        }
+        scaleF *= 0.5;
       }
-      scaleF *= 0.5;
+      if (accepted) break;
     }
     if (!accepted) break;
   }

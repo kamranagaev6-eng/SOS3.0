@@ -74,7 +74,7 @@ function build(v: Values, rig: RigDefinition) {
   // Initial guesses must lie strictly inside leg reach: beyond it the knee angle is flat (zero gradient).
   const legLen = L.ankleHeight + 0.93 * (L.thigh + L.shank);
 
-  const stand = solveKeyPose(rig, pelvisRotation(rig, 0, 0, 0), targets, [0, legLen, 0.03], [1], [{ quantity: 'kneeFlexion', side: 'mean', target: STANDING_KNEE }]);
+  const stand = solveKeyPose(rig, pelvisRotation(rig, 0, 0, 0), targets, [0, legLen, 0.03], [1], [{ quantity: 'kneeFlexion', side: 'min', target: STANDING_KNEE }]);
   const lean = deg(num(v, 'trunkLeanDeg'));
   const tl = trunkLean(lean);
   const bottom = solveKeyPose(rig, pelvisRotation(rig, 0, tl.tilt, 0), targets, [0, legLen * 0.7, -0.1], [1, 2], [
@@ -137,7 +137,7 @@ function build(v: Values, rig: RigDefinition) {
     },
     seat: null,
     assumptions: [
-      `Standing key pose solved for ${fmtDeg(STANDING_KNEE)} mean knee flexion (avoids the straight-knee singularity).`,
+      `Standing key pose solved for ${fmtDeg(STANDING_KNEE)} knee flexion of the straighter leg (avoids the straight-knee singularity).`,
       `Bottom key pose solved for ${fmtDeg(depth)} mean knee flexion and ${fmtDeg(dorsi)} mean ankle dorsiflexion (shank-lean heuristic).`,
       'Trunk inclination split: pelvis 55 %, lumbar 25 %, thoracic 20 %; neck counter-flexes 45 %.',
       'Both feet remain flat on the floor for the whole clip; no heel lift is modelled.',

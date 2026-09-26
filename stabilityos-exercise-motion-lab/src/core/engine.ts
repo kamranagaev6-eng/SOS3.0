@@ -19,3 +19,13 @@ export { standingHeight } from './rig/canonical.ts';
 export type { PoseSample, SolverTier, ContactEvaluation, FootTarget, LegReport, LimitEvent, StabilizationReport } from './solver/types.ts';
 export type { BakedClip, ClipMetrics } from './metrics/types.ts';
 export type { RecipeDefinition, CompileResult } from './recipes/types.ts';
+export {
+  createHostRigAdapter,
+  assessCapabilities,
+  capabilityRequirements,
+  SYNTHETIC_HOST_RIGS,
+  getSyntheticHostRig,
+  type HostRigAdapter,
+  type AdapterResult,
+  type HostPose,
+} from './adapter/index.ts';

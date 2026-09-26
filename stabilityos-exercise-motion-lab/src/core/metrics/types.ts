@@ -35,6 +35,14 @@ export interface ClipMetrics {
   maxJointVelocityJump: number;
   /** Max velocity jump for pelvis and contact sites (m/s). */
   maxLinearVelocityJump: number;
+  /**
+   * Raw values at `sampleRate` before refinement. A true C1 break gives a rate-independent value;
+   * smooth acceleration gives |θ''|·h. Where the raw value exceeds tolerance, analyzePlan re-samples
+   * the neighbourhood at h/4: the reported max*VelocityJump uses the refined value there.
+   */
+  rawJointVelocityJump: number;
+  rawLinearVelocityJump: number;
+  refinedCandidates: number;
   maxStabilizationOffset: number;
   stabilizedSamples: number;
   nonConvergedSamples: number;

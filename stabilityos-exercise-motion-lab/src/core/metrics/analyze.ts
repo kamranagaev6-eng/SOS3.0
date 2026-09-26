@@ -54,6 +54,9 @@ export class ClipAnalyzer {
       clampedSamples: 0,
       maxJointVelocityJump: 0,
       maxLinearVelocityJump: 0,
+      rawJointVelocityJump: 0,
+      rawLinearVelocityJump: 0,
+      refinedCandidates: 0,
       maxStabilizationOffset: 0,
       stabilizedSamples: 0,
       nonConvergedSamples: 0,
@@ -131,19 +134,56 @@ export class ClipAnalyzer {
     if (this.prev.length > 3) this.prev.shift();
     if (this.prev.length === 3) {
       const [a, b, c] = this.prev as [PoseSample, PoseSample, PoseSample];
-      for (let j = 0; j < a.angles.length; j++)
-        for (let k = 0; k < a.angles[j]!.length; k++) {
-          const jump = Math.abs(c.angles[j]![k]! - 2 * b.angles[j]![k]! + a.angles[j]![k]!) / this.h;
-          m.maxJointVelocityJump = Math.max(m.maxJointVelocityJump, jump);
-        }
-      const lin = (pa: Vec3, pb: Vec3, pc: Vec3) => Math.hypot(pc[0] - 2 * pb[0] + pa[0], pc[1] - 2 * pb[1] + pa[1], pc[2] - 2 * pb[2] + pa[2]) / this.h;
-      m.maxLinearVelocityJump = Math.max(m.maxLinearVelocityJump, lin(a.pelvisWorld, b.pelvisWorld, c.pelvisWorld));
-      for (let i = 0; i < a.sitePos.length; i++) m.maxLinearVelocityJump = Math.max(m.maxLinearVelocityJump, lin(a.sitePos[i]!, b.sitePos[i]!, c.sitePos[i]!));
+      const { joint, linear } = secondDifferenceJumps(a, b, c, this.h);
+      m.rawJointVelocityJump = Math.max(m.rawJointVelocityJump, joint);
+      m.rawLinearVelocityJump = Math.max(m.rawLinearVelocityJump, linear);
+      if (joint > TOLERANCES.jointVelocityJump || linear > TOLERANCES.linearVelocityJump) this.candidates.push(b.t);
+      else {
+        this.smoothJoint = Math.max(this.smoothJoint, joint);
+        this.smoothLinear = Math.max(this.smoothLinear, linear);
+      }
     }
   }
 
+  private readonly candidates: number[] = [];
+  private smoothJoint = 0;
+  private smoothLinear = 0;
+
+  /**
+   * Two-rate discontinuity test: re-sample [t − h, t + h] at h/4 around each candidate. A C1
+   * break keeps its size; smooth acceleration shrinks 4×. Without a sampler, raw values stand.
+   */
+  refine(sampleAt: (t: number) => PoseSample): void {
+    const m = this.m;
+    let joint = this.smoothJoint;
+    let linear = this.smoothLinear;
+    let last = -Infinity;
+    const q = this.h / 4;
+    for (const t of this.candidates) {
+      if (t - last < this.h) continue;
+      last = t;
+      m.refinedCandidates++;
+      const ss: PoseSample[] = [];
+      for (let k = -4; k <= 4; k++) ss.push(sampleAt(Math.min(this.plan.duration, Math.max(0, t + k * q))));
+      for (let k = 1; k + 1 < ss.length; k++) {
+        const r = secondDifferenceJumps(ss[k - 1]!, ss[k]!, ss[k + 1]!, q);
+        joint = Math.max(joint, r.joint);
+        linear = Math.max(linear, r.linear);
+      }
+    }
+    m.maxJointVelocityJump = joint;
+    m.maxLinearVelocityJump = linear;
+    this.refined = true;
+  }
+
+  private refined = false;
+
   finish(): ClipMetrics {
     const m = this.m;
+    if (!this.refined) {
+      m.maxJointVelocityJump = m.rawJointVelocityJump;
+      m.maxLinearVelocityJump = m.rawLinearVelocityJump;
+    }
     const f: string[] = [];
     const chk = (ok: boolean, msg: string) => {
       if (!ok) f.push(msg);
@@ -168,6 +208,16 @@ export class ClipAnalyzer {
   }
 }
 
+function secondDifferenceJumps(a: PoseSample, b: PoseSample, c: PoseSample, h: number): { joint: number; linear: number } {
+  let joint = 0;
+  for (let j = 0; j < a.angles.length; j++)
+    for (let k = 0; k < a.angles[j]!.length; k++) joint = Math.max(joint, Math.abs(c.angles[j]![k]! - 2 * b.angles[j]![k]! + a.angles[j]![k]!) / h);
+  const lin = (pa: Vec3, pb: Vec3, pc: Vec3) => Math.hypot(pc[0] - 2 * pb[0] + pa[0], pc[1] - 2 * pb[1] + pa[1], pc[2] - 2 * pb[2] + pa[2]) / h;
+  let linear = lin(a.pelvisWorld, b.pelvisWorld, c.pelvisWorld);
+  for (let i = 0; i < a.sitePos.length; i++) linear = Math.max(linear, lin(a.sitePos[i]!, b.sitePos[i]!, c.sitePos[i]!));
+  return { joint, linear };
+}
+
 export function analyzeClip(clip: BakedClip): ClipMetrics {
   const a = new ClipAnalyzer(clip.plan, clip.rig, clip.tier, clip.fps);
   for (const f of clip.frames) a.push(f);
@@ -178,5 +228,6 @@ export function analyzeClip(clip: BakedClip): ClipMetrics {
 export function analyzePlan(plan: MotionPlan, rig: RigDefinition, tier: SolverTier = 'stabilized', rate: number = TOLERANCES.continuityRate): ClipMetrics {
   const a = new ClipAnalyzer(plan, rig, tier, rate);
   for (const t of bakeTimes(plan.duration, rate)) a.push(samplePose(plan, rig, t, tier));
+  a.refine((t) => samplePose(plan, rig, t, tier));
   return a.finish();
 }

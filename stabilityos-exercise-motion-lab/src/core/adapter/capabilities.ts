@@ -161,7 +161,7 @@ export function assessCapabilities(host: HostSkeleton, boneMap: BoneMap): Capabi
 }
 
 /** Actionable, host-specific instruction for obtaining a capability. */
-export function capabilityHint(host: HostSkeleton, boneMap: BoneMap, cap: Capability, requiredBy?: readonly string[]): string {
+export function capabilityHint(host: HostSkeleton, boneMap: BoneMap, cap: Capability, requiredBy?: readonly string[], required = true): string {
   const ctx = contextFor(host, boneMap);
   const name = (j: string, fallback: string): string => {
     const b = boneOf(ctx, j);
@@ -209,14 +209,20 @@ export function capabilityHint(host: HostSkeleton, boneMap: BoneMap, cap: Capabi
       hint = `Map 'neck' to a neck bone that descends from ${q(pelvis)} through the spine`;
       break;
   }
-  const by = requiredBy && requiredBy.length ? requiredBy.join(' and ') : null;
-  const why: Partial<Record<Capability, string>> = {
-    'forefoot-articulation': 'forefoot contact',
+  const by = requiredBy && requiredBy.length ? (requiredBy.length === 1 ? requiredBy[0]! : `${requiredBy.slice(0, -1).join(', ')} and ${requiredBy[requiredBy.length - 1]}`) : null;
+  const why: Record<Capability, string> = {
     'root-translation': 'whole-body translation',
+    'pelvis-rotation': 'pelvis tilt, obliquity and rotation',
     'trunk-articulation': 'trunk lean relative to the pelvis',
+    'independent-legs': 'independent left/right leg motion',
+    'knee-hinge': 'knee flexion',
+    'ankle-2dof': 'ankle dorsiflexion and inversion',
+    'forefoot-articulation': 'forefoot contact',
+    'independent-arms': 'independent arm motion',
+    neck: 'head and neck motion',
   };
-  const reason = why[cap] ? ` (${why[cap]})` : '';
-  return by ? `${hint}; required by ${by}${reason}.` : `${hint}; required by the requested motion${reason}.`;
+  if (by) return `${hint}; required by ${by} (${why[cap]}).`;
+  return required ? `${hint}; required by the requested motion (${why[cap]}).` : `${hint}; needed for ${why[cap]}.`;
 }
 
 /**
